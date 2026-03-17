@@ -31,3 +31,28 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Additional ignores ###
+
+# Compiled class files
+*.class
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / Secrets
+.env
+.env.*
+# Application properties often contain DB credentials - keep a template in the repo and keep real creds out
+/src/main/resources/application.properties
+
+# Temporary editor files
+*~
+*.swp
+
+# Maven wrapper artifacts should remain in the repo (mvnw, .mvn) - do not ignore them here
