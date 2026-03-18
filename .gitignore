@@ -49,7 +49,7 @@ Thumbs.db
 .env
 .env.*
 # Application properties often contain DB credentials - keep a template in the repo and keep real creds out
-/src/main/resources/application.properties
+/src/main/resources/application-postgres.properties
 
 # Temporary editor files
 *~
