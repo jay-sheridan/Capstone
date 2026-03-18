@@ -1,0 +1,89 @@
+package ca.cars365.exception;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import ca.cars365.beans.ErrorType;
+import ca.cars365.dto.response.ErrorResponse;
+import ca.cars365.dto.response.ValidationErrorResponse;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+		public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+		
+		Map<String, List<String>> fieldErrors = new LinkedHashMap<>();
+        List<String> missingRequiredFields = new ArrayList<>();
+
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            String fieldName = error.getField();
+            String message = error.getDefaultMessage();
+
+            fieldErrors.computeIfAbsent(fieldName, k -> new ArrayList<>()).add(message);
+
+            if ("NotBlank".equals(error.getCode()) || "NotNull".equals(error.getCode())) {
+                if (!missingRequiredFields.contains(fieldName)) {
+                    missingRequiredFields.add(fieldName);
+                }
+            }
+        }
+
+        ValidationErrorResponse response = new ValidationErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                ErrorType.VALIDATION_ERROR,
+                "Request validation failed",
+                missingRequiredFields,
+                fieldErrors
+        );
+
+        return ResponseEntity.badRequest().body(response);
+	}
+	
+	@ExceptionHandler(AccountAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleAccountExistsException(AccountAlreadyExistsException ex) {
+        ErrorResponse error = new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.CONFLICT.value(),
+                ErrorType.AccountAlreadyExistsException
+        );
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    // 🔴 Generic fallback (VERY IMPORTANT)
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
+//    	System.out.println("Handling general exception: " + ex.getMessage() + " | Trace: " + ex.getStackTrace());
+//        ErrorResponse error = new ErrorResponse(
+//                "Something went wrong",
+//                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//                null
+//        );
+//
+//        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
+    
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex) {
+        ErrorResponse error = new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.UNAUTHORIZED.value(),
+                ErrorType.InvalidCredentialsException
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+    
+}
