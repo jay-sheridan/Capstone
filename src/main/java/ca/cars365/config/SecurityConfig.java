@@ -35,13 +35,14 @@ public class SecurityConfig {
 		
 		http
 		.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers("/api/v1/auth/**", "/api/v1/home/**").permitAll()
+				.requestMatchers("/api/v1/auth/**", "/api/v1/home/**", "/h2-console/**").permitAll()
 				.anyRequest().authenticated()
 				)
 		.csrf(csrf -> csrf.disable())
 		.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		.authenticationProvider(authenticationProvider)
 		.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+		.headers(headers -> headers.frameOptions(frame -> frame.disable()))
 		;
 		
 		return http.build();
