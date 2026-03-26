@@ -1,0 +1,15 @@
+package ca.cars365.enums;
+
+public enum InspectionRequestStatus {
+	DRAFT,
+    SUBMITTED,
+    AGENCY_ASSIGNED,
+    APPOINTMENT_BOOKED,
+    INSPECTION_IN_PROGRESS,
+    BACKGROUND_CHECK_IN_PROGRESS,
+    ON_HOLD,
+    APPROVED,
+    REJECTED,
+    COMPLETED,
+    CANCELLED
+}

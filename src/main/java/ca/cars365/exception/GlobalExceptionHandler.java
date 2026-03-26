@@ -51,6 +51,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
 	}
 	
+	@ExceptionHandler(InvalidVinException.class)
+    public ResponseEntity<Object> handleInvalidVin(InvalidVinException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+	
 	@ExceptionHandler(AccountAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleAccountExistsException(AccountAlreadyExistsException ex) {
         ErrorResponse error = new ErrorResponse(

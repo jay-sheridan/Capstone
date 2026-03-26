@@ -9,9 +9,8 @@ import org.springframework.stereotype.Service;
 import ca.cars365.beans.AuthenticationRequest;
 import ca.cars365.beans.AuthenticationResponse;
 import ca.cars365.dto.request.RegistrationRequest;
-import ca.cars365.entity.Role;
-import ca.cars365.entity.Status;
 import ca.cars365.entity.Users;
+import ca.cars365.enums.UserRole;
 import ca.cars365.exception.AccountAlreadyExistsException;
 import ca.cars365.exception.InvalidCredentialsException;
 import ca.cars365.repositories.UserRepository;
@@ -28,14 +27,14 @@ public class AuthenticationService {
 
 	public AuthenticationResponse register(RegistrationRequest request) {
 
-		if (userRepository.existsByEmail(request.getEmail()) || userRepository.existsByPhone(request.getPhone())) {
+		if (userRepository.existsByEmail(request.getEmail()) || userRepository.existsByPhoneNumber(request.getPhone())) {
 
 			throw new AccountAlreadyExistsException("Account already exists!");
 		}
 
 		var user = Users.builder().fullName(request.getFullName()).email(request.getEmail())
-				.password(passwordEncoder.encode(request.getPassword())).role(Role.USER).phone(request.getPhone())
-				.status(Status.ACTIVE).build();
+				.passwordHash(passwordEncoder.encode(request.getPassword())).role(UserRole.REGULAR_USER)
+				.phoneNumber(request.getPhone()).build();
 
 		userRepository.save(user);
 

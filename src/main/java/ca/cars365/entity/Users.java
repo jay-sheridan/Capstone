@@ -1,6 +1,6 @@
 package ca.cars365.entity;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -9,6 +9,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import ca.cars365.enums.UserRole;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,64 +18,59 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "users")
-public class Users implements UserDetails {
+public class Users extends BaseEntity implements UserDetails {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "user_id")
-	private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "regular_user_id")
+    private Long id;
 
-	@Column(name = "full_name", nullable = false, length = 150)
-	private String fullName;
+    @Column(name = "full_name", nullable = false, length = 100)
+    private String fullName;
 
-	@Column(name = "email", nullable = false, unique = true, length = 255)
-	private String email;
+    @Column(nullable = false, unique = true, length = 255)
+    private String email;
 
-	@Column(name = "password_hash", nullable = false, columnDefinition = "TEXT")
-	private String password;
+    @Column(name = "password_hash", nullable = false, columnDefinition = "TEXT")
+    private String passwordHash;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "role", nullable = false, length = 20)
-	private Role role;
+    @Column(length = 30)
+    private String phoneNumber;
 
-	@Column(name = "phone", length = 30, unique = true, nullable = false)
-	private String phone;
+    @Column(length = 500)
+    private String profileImageUrl;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "status", nullable = false, length = 20)
-	private Status status = Status.ACTIVE;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    @Builder.Default
+    private UserRole role = UserRole.REGULAR_USER;
 
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean active = true;
 
-	@Column(name = "updated_at", nullable = false)
-	private LocalDateTime updatedAt;
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Vehicle> vehicles = new ArrayList<>();
 
-	// Automatically set timestamps
-	@PrePersist
-	protected void onCreate() {
-		createdAt = LocalDateTime.now();
-		updatedAt = LocalDateTime.now();
-	}
+//    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<InspectionRequest> inspectionRequests = new ArrayList<>();
 
-	@PreUpdate
-	protected void onUpdate() {
-		updatedAt = LocalDateTime.now();
-	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -84,7 +81,7 @@ public class Users implements UserDetails {
 	@Override
 	public @Nullable String getPassword() {
 		// TODO Auto-generated method stub
-		return this.password;
+		return this.passwordHash;
 	}
 
 	@Override

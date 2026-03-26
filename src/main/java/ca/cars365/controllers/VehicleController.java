@@ -1,0 +1,44 @@
+package ca.cars365.controllers;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import ca.cars365.dto.response.VehicleVinResponse;
+import lombok.AllArgsConstructor;
+
+@RestController
+@RequestMapping("/api/v1/vehicles")
+@AllArgsConstructor
+public class VehicleController {
+
+	private final VehicleService vehicleService;
+	
+	@GetMapping("/{vehicleId}")
+	public ResponseEntity<Object> getVehicleById(@PathVariable Long vehicleId) {
+		return null;
+	}
+	
+//	@GetMapping("/vin/{vin}")
+//	public ResponseEntity<Object> getVehicleByVin(@PathVariable String vin) {
+//
+//		String url = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/" 
+//		              + vin + "?format=json";
+//
+//		RestTemplate restTemplate = new RestTemplate();
+//		ResponseEntity<Object> response = restTemplate.getForEntity(url, Object.class);
+//		
+//		return ResponseEntity.ok(response.getBody());
+//	}
+	
+	@GetMapping("/vin/{vin}")
+	public ResponseEntity<VehicleVinResponse> getVehicleByVin(@PathVariable String vin) {
+	    return ResponseEntity.ok(vehicleService.getVehicleInfoByVin(vin));
+	}
+}
