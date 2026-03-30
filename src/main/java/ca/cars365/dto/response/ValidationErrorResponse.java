@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import ca.cars365.beans.ErrorType;
+import ca.cars365.enums.ErrorType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

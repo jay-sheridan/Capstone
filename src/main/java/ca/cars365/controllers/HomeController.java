@@ -23,4 +23,18 @@ public class HomeController {
 		List<Users> users = userRepository.findAll();
 		return ResponseEntity.ok(users);
 	}
+	
+	@GetMapping("/user")
+	public ResponseEntity<String> userTest() {
+		return ResponseEntity.ok("Hello, regular user!");
+	}
+	
+	@GetMapping("/agency")
+	public ResponseEntity<String> agencyTest() {
+		return ResponseEntity.ok("Hello, inspection agency!");
+	}
+	@GetMapping("/all")
+	public ResponseEntity<String> allTest() {
+		return ResponseEntity.ok("Hello, authenticated user!");
+	}
 }

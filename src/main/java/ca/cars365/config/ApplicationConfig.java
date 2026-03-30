@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import ca.cars365.repositories.UserRepository;
+import ca.cars365.services.InspectionAgencyDetailsService;
 import lombok.AllArgsConstructor;
 
 @Configuration
@@ -19,6 +20,7 @@ import lombok.AllArgsConstructor;
 public class ApplicationConfig {
 
 	private UserRepository userRepository;
+	private InspectionAgencyDetailsService inspectionAgencyDetailsService;
 	
 	@Bean
 	public UserDetailsService userDetailsService() {
@@ -26,10 +28,11 @@ public class ApplicationConfig {
 				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 	}
 	
+	
 	@Bean
 	public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-		authProvider.setPasswordEncoder(passwrodEncoder());
+		authProvider.setPasswordEncoder(passwordEncoder());
 		return authProvider;
 	}
 	
@@ -39,7 +42,7 @@ public class ApplicationConfig {
 	}
 	
 	@Bean
-	public PasswordEncoder passwrodEncoder() {
+	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 }

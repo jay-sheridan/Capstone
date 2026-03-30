@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import ca.cars365.dto.response.VehicleVinResponse;
+import ca.cars365.services.VehicleService;
 import lombok.AllArgsConstructor;
 
 @RestController

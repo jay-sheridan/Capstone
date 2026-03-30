@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import ca.cars365.controllers.VehicleService;
 import ca.cars365.dto.response.VehicleVinResponse;
 import ca.cars365.exception.InvalidVinException;
 

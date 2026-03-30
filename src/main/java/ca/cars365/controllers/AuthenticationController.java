@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ca.cars365.beans.AuthenticationRequest;
-import ca.cars365.beans.AuthenticationResponse;
-import ca.cars365.dto.request.RegistrationRequest;
+import ca.cars365.dto.request.InspectionAgencyLoginRequest;
+import ca.cars365.dto.request.InspectionAgencyRegistrationRequest;
+import ca.cars365.dto.request.UserLoginRequest;
+import ca.cars365.dto.request.UserRegistrationRequest;
+import ca.cars365.dto.response.AuthenticationResponse;
 import ca.cars365.services.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -21,12 +23,24 @@ public class AuthenticationController {
 	private AuthenticationService authenticationService;
 	
 	@PostMapping(value = "/register", consumes = "application/json")
-	public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody RegistrationRequest request) {
+	public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody UserRegistrationRequest request) {
 		return ResponseEntity.ok(authenticationService.register(request));
 	}
 	
 	@PostMapping(value = "/authenticate", consumes = "application/json")
-	public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
+	public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody UserLoginRequest request) {
 		return ResponseEntity.ok(authenticationService.authenticate(request));
 	}
+	
+	@PostMapping(value = "/agency/register", consumes = "application/json")
+	public ResponseEntity<AuthenticationResponse> registerAgency(@Valid @RequestBody InspectionAgencyRegistrationRequest request) {
+		return ResponseEntity.ok(authenticationService.registerInspectionAgency(request));
+	}
+	
+	@PostMapping(value = "/agency/authenticate", consumes = "application/json")
+	public ResponseEntity<AuthenticationResponse> authenticateAgency(@RequestBody InspectionAgencyLoginRequest request) {
+		return ResponseEntity.ok(authenticationService.authenticateInspectionAgency(request));
+	}
+	
+	
 }

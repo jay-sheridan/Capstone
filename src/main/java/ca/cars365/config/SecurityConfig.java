@@ -14,6 +14,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import ca.cars365.enums.UserRole;
 import ca.cars365.filters.JwtAuthenticationFilter;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -33,7 +34,6 @@ import lombok.AllArgsConstructor;
 public class SecurityConfig {
 
     private JwtAuthenticationFilter jwtAuthFilter;
-    private AuthenticationProvider authenticationProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -42,11 +42,13 @@ public class SecurityConfig {
             .cors(cors -> {})
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/v1/auth/**", "/api/v1/home/**", "/h2-console/**").permitAll()
+                .requestMatchers("/api/v1/auth/**", "/api/v1/home/test/", "/h2-console/**").permitAll()
+                .requestMatchers("/api/v1/home/test/user").hasAuthority(UserRole.REGULAR_USER.name())
+                .requestMatchers("/api/v1/home/test/agency").hasAuthority(UserRole.INSPECTION_AGENCY.name())
+                .requestMatchers("/api/v1/home/test/all").hasAnyAuthority(UserRole.REGULAR_USER.name(), UserRole.INSPECTION_AGENCY.name())
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 

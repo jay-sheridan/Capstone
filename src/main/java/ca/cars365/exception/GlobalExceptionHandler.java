@@ -13,9 +13,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import ca.cars365.beans.ErrorType;
 import ca.cars365.dto.response.ErrorResponse;
 import ca.cars365.dto.response.ValidationErrorResponse;
+import ca.cars365.enums.ErrorType;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -67,6 +67,16 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
+	
+	@ExceptionHandler(InspectionAgencyNotFoundException.class)
+		public ResponseEntity<ErrorResponse> handleInspectionAgencyNotFound(InspectionAgencyNotFoundException ex) {
+				ErrorResponse error = new ErrorResponse(
+				ex.getMessage(),
+				HttpStatus.NOT_FOUND.value(),
+				ErrorType.InspectionAgencyNotFoundException
+		);
+		return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+	}
 
     // 🔴 Generic fallback (VERY IMPORTANT)
 //    @ExceptionHandler(Exception.class)

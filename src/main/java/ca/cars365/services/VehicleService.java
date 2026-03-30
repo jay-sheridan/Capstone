@@ -1,4 +1,4 @@
-package ca.cars365.controllers;
+package ca.cars365.services;
 
 import org.springframework.stereotype.Service;
 

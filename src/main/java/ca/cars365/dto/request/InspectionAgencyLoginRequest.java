@@ -1,4 +1,4 @@
-package ca.cars365.beans;
+package ca.cars365.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthenticationRequest {
+public class InspectionAgencyLoginRequest {
 
-	private String fullName;
-	private String email;
+	private String licenseNumber;
 	private String password;
-	private String phone;
 }

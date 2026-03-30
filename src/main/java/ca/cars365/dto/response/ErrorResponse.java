@@ -2,7 +2,7 @@ package ca.cars365.dto.response;
 
 import java.time.LocalDateTime;
 
-import ca.cars365.beans.ErrorType;
+import ca.cars365.enums.ErrorType;
 import lombok.Data;
 
 @Data

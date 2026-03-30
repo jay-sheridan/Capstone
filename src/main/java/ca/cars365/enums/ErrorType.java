@@ -1,7 +1,8 @@
-package ca.cars365.beans;
+package ca.cars365.enums;
 
 public enum ErrorType {
 	AccountAlreadyExistsException,
 	InvalidCredentialsException,
-	VALIDATION_ERROR
+	VALIDATION_ERROR,
+	InspectionAgencyNotFoundException,
 }
