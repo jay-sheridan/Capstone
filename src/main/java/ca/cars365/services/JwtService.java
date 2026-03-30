@@ -41,10 +41,9 @@ public class JwtService {
 				.compact();
 	}
 
-	public String generateToken(UserDetails userDetails, String accountType) {
+	public String generateToken(UserDetails userDetails) {
 		Map<String, Object> extraClaims = new HashMap<>();
 		extraClaims.put("role", userDetails.getAuthorities().stream().findFirst().orElseThrow().getAuthority());
-		extraClaims.put("accountType", accountType);
 		return generateToken(extraClaims, userDetails);
 	}
 
@@ -56,9 +55,6 @@ public class JwtService {
 		return extractAllClaims(token).get("role", String.class);
 	}
 
-	public String extractAccountType(String token) {
-		return extractAllClaims(token).get("accountType", String.class);
-	}
 
 	public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
 		Claims claims = extractAllClaims(token);

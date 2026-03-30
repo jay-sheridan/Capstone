@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import ca.cars365.enums.ReportResult;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -61,11 +62,13 @@ public class InspectionReport extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String recommendedRepairs;
 
-    private LocalDate validUntil;
+    private LocalDate inspectionDate;
 
+
+    
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inspection_request_id", nullable = false, unique = true)
-    private InspectionRequest inspectionRequest;
+    @JoinColumn(name = "vehicle_listing_id", nullable = false, unique = true)
+    private VehicleListing vehicleListing;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", nullable = false)
@@ -74,6 +77,10 @@ public class InspectionReport extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inspection_agency_id", nullable = false)
     private InspectionAgency inspectionAgency;
+    
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inspection_appointment_id", nullable = false, unique = true)
+    private InspectionAppointment inspectionAppointment;	
 
     @PrePersist
     public void generateReportNumber() {

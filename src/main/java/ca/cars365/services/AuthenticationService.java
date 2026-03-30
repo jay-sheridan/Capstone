@@ -43,7 +43,7 @@ public class AuthenticationService {
 
 		userRepository.save(user);
 
-		return AuthenticationResponse.builder().token(jwtService.generateToken(user, UserRole.REGULAR_USER.name())).build();
+		return AuthenticationResponse.builder().token(jwtService.generateToken(user)).build();
 	}
 
 	public AuthenticationResponse authenticate(UserLoginRequest request) {
@@ -55,7 +55,7 @@ public class AuthenticationService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-		return AuthenticationResponse.builder().token(jwtService.generateToken(user, UserRole.REGULAR_USER.name())).build();
+		return AuthenticationResponse.builder().token(jwtService.generateToken(user)).build();
 	}
 	
 	public AuthenticationResponse registerInspectionAgency(InspectionAgencyRegistrationRequest request) {
@@ -79,7 +79,7 @@ public class AuthenticationService {
 		
 		inspectionAgencyRepository.save(agency);
 		
-		return AuthenticationResponse.builder().token(jwtService.generateToken(agency, UserRole.INSPECTION_AGENCY.name())).build();
+		return AuthenticationResponse.builder().token(jwtService.generateToken(agency)).build();
 	}
 	
 	public AuthenticationResponse authenticateInspectionAgency(InspectionAgencyLoginRequest request) {
@@ -92,6 +92,6 @@ public class AuthenticationService {
         }
 		
 		
-		return AuthenticationResponse.builder().token(jwtService.generateToken(agency, UserRole.INSPECTION_AGENCY.name())).build();
+		return AuthenticationResponse.builder().token(jwtService.generateToken(agency)).build();
 	} 
 }

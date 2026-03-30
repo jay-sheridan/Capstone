@@ -13,7 +13,6 @@ public interface InspectionAppointmentRepository extends JpaRepository<Inspectio
 
 	List<InspectionAppointment> findByAppointmentDateTime(LocalDateTime appointmentDateTime);
 	
-	List<InspectionAppointment> findByInspectionRequestId(Long inspectionRequestId);
 	
 	List<InspectionAppointment> findByAppointmentStatus(String appointmentStatus);
 	
@@ -21,7 +20,6 @@ public interface InspectionAppointmentRepository extends JpaRepository<Inspectio
 	
 	boolean existsByVehicleId(Long vehicleId);
 	
-	boolean existsByInspectionRequestId(Long inspectionRequestId);
 	
 	
 }

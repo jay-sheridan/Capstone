@@ -1,8 +1,12 @@
 package ca.cars365.entity;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ca.cars365.enums.AppointmentStatus;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,19 +46,6 @@ public class InspectionAppointment extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime appointmentDateTime;
 
-    private Integer estimatedDurationMinutes;
-
-    @Column(length = 255)
-    private String locationAddress;
-
-    @Column(length = 100)
-    private String city;
-
-    @Column(length = 100)
-    private String provinceState;
-
-    @Column(length = 30)
-    private String postalCode;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
@@ -62,13 +54,26 @@ public class InspectionAppointment extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String bookingNotes;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inspection_request_id", nullable = false)
-    private InspectionRequest inspectionRequest;
     
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vehicle_id", nullable = false)
-    private Vehicle vehicle;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "seller_id", nullable = false)
+	private Users seller;
     
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "vehicle_id", nullable = false)
+	private Vehicle vehicle;
+    
+    @OneToOne(mappedBy = "inspectionAppointment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+	private InspectionReport inspectionReport;
+    
+	@Column(nullable = false, unique = true, length = 100)
+	private String appointmentNumber;
+	
+	@PrePersist
+	public void generateAppointmentNumber() {
+		if (this.appointmentNumber == null || this.appointmentNumber.isBlank()) {
+			this.appointmentNumber = "REQ-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+		}
+	}
 }

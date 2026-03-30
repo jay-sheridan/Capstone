@@ -5,4 +5,6 @@ public enum ErrorType {
 	InvalidCredentialsException,
 	VALIDATION_ERROR,
 	InspectionAgencyNotFoundException,
+	ResourceNotFoundException,
+	DuplicateResourceException,
 }

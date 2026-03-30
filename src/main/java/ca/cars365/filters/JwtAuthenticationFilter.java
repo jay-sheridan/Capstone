@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String authHeader = request.getHeader("Authorization");
 		String jwt;
 		String username;
-		String accountType;
+		String role;
 
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 
@@ -43,17 +43,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		jwt = authHeader.substring(7);
 		username = jwtService.extractUsername(jwt);
-		accountType = jwtService.extractAccountType(jwt);
+		role = jwtService.extractRole(jwt);
 
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
 			UserDetails userDetails = null;
-			if (UserRole.valueOf(accountType).equals(UserRole.REGULAR_USER)) {
+			if (UserRole.valueOf(role).equals(UserRole.REGULAR_USER)) {
 				
 				 userDetails = userDetailsService.loadUserByUsername(username);
 
 			}
-			 else if (UserRole.valueOf(accountType).equals(UserRole.INSPECTION_AGENCY)) {
+			 else if (UserRole.valueOf(role).equals(UserRole.INSPECTION_AGENCY)) {
 			
 				  userDetails = inspectionAgencyDetailsService.loadByLicenseNumber(username);
 			 }

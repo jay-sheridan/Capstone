@@ -1,5 +1,7 @@
 package ca.cars365.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -55,13 +57,12 @@ public class VinDecodeRecord extends BaseEntity {
 
     @Column(length = 100)
     private String plantCountry;
+    
+    private LocalDateTime vinDecodedAt;
 
     @Column(nullable = false)
     @Builder.Default
     private Boolean decodeSuccess = true;
-
-    @Column(columnDefinition = "TEXT")
-    private String rawResponseJson;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", unique = true)

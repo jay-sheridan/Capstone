@@ -43,7 +43,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/v1/auth/**", "/api/v1/home/test/", "/h2-console/**").permitAll()
-                .requestMatchers("/api/v1/home/test/user").hasAuthority(UserRole.REGULAR_USER.name())
+                .requestMatchers("/api/v1/vin-decode/**").hasAuthority(UserRole.REGULAR_USER.name())
                 .requestMatchers("/api/v1/home/test/agency").hasAuthority(UserRole.INSPECTION_AGENCY.name())
                 .requestMatchers("/api/v1/home/test/all").hasAnyAuthority(UserRole.REGULAR_USER.name(), UserRole.INSPECTION_AGENCY.name())
                 .anyRequest().authenticated()

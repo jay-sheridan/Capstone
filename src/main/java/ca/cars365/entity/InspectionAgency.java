@@ -9,6 +9,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import ca.cars365.enums.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -87,16 +89,19 @@ public class InspectionAgency extends BaseEntity implements UserDetails {
 
     @OneToMany(mappedBy = "inspectionAgency")
     @Builder.Default
-    private List<InspectionRequest> inspectionRequests = new ArrayList<>();
+    @JsonIgnore
+    private List<InspectionReport> inspectionReports = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "inspectionAgency")
+    @Builder.Default
+    @JsonIgnore
+    private List<InspectionAppointment> inspectionAppointments = new ArrayList<>();
 
     @OneToMany(mappedBy = "inspectionAgency")
     @Builder.Default
-    private List<InspectionReport> inspectionReports = new ArrayList<>();
-
-    @OneToMany(mappedBy = "issuedByAgency")
-    @Builder.Default
-    private List<CertificationRecord> certificationRecords = new ArrayList<>();
-
+    @JsonIgnore
+    private List<VehicleListing> vehicleListings = new ArrayList<>();
+    
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		

@@ -1,6 +1,6 @@
 package ca.cars365.enums;
 
-public enum InspectionRequestStatus {
+public enum InspectionStatus {
 	DRAFT,
     SUBMITTED,
     AGENCY_ASSIGNED,

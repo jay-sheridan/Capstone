@@ -26,20 +26,4 @@ public class VehicleController {
 		return null;
 	}
 	
-//	@GetMapping("/vin/{vin}")
-//	public ResponseEntity<Object> getVehicleByVin(@PathVariable String vin) {
-//
-//		String url = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/" 
-//		              + vin + "?format=json";
-//
-//		RestTemplate restTemplate = new RestTemplate();
-//		ResponseEntity<Object> response = restTemplate.getForEntity(url, Object.class);
-//		
-//		return ResponseEntity.ok(response.getBody());
-//	}
-	
-	@GetMapping("/vin/{vin}")
-	public ResponseEntity<VehicleVinResponse> getVehicleByVin(@PathVariable String vin) {
-	    return ResponseEntity.ok(vehicleService.getVehicleInfoByVin(vin));
-	}
 }

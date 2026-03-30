@@ -11,9 +11,7 @@ import ca.cars365.entity.Vehicle;
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
-	Optional<Vehicle> findByVinNumber(String vinNumber);
-
-    boolean existsByVinNumber(String vinNumber);
+	
 
     List<Vehicle> findBySellerId(Long sellerId);
 }
