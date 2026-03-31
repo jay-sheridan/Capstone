@@ -1,5 +1,6 @@
 package ca.cars365.entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,18 +32,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Vehicle {
+public class Vehicle extends BaseEntity {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vehicle_id")
     private Long id;
 
+	@Column(nullable = false)
+	private String vehicleName;
 
-    private Double askingPrice;
-
-    @Column(length = 100)
-    private String registrationProvince;
+	@Builder.Default
+    private Double askingPrice = 0.0;
 
     @Column(nullable = false)
     @Builder.Default
@@ -76,7 +77,7 @@ public class Vehicle {
     @Enumerated(EnumType.STRING)
     private InspectionStatus inspectionStatus = InspectionStatus.DRAFT;
     
-    @OneToOne(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vin_decode_record_id", unique = true)
     private VinDecodeRecord vinDecodeRecord;
 }

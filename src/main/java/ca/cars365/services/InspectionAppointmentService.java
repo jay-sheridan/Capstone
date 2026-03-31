@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import ca.cars365.dto.request.InspectionAppointmentCreateRequest;
+import ca.cars365.dto.response.InspectionAppointmentResponse;
 import ca.cars365.entity.InspectionAppointment;
 
 @Service
 public interface InspectionAppointmentService {
 
-	InspectionAppointment saveAppointment(InspectionAppointment appointment);
+	InspectionAppointmentResponse saveAppointment(InspectionAppointmentCreateRequest appointment);
 
     InspectionAppointment getAppointmentById(Long id);
 

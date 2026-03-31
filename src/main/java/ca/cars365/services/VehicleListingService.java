@@ -21,4 +21,6 @@ public interface VehicleListingService {
     Vehicle updateVehicle(Long id, Vehicle updatedVehicle);
 
     void deleteVehicle(Long id);
+
+	void createVehicleListingForVehicle(Long id);
 }

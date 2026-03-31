@@ -43,7 +43,8 @@ public class InspectionReport extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private ReportResult overallResult;
+    @Builder.Default
+    private ReportResult overallResult = ReportResult.PENDING;
 
     @Column(columnDefinition = "TEXT")
     private String summary;
@@ -63,12 +64,6 @@ public class InspectionReport extends BaseEntity {
     private String recommendedRepairs;
 
     private LocalDate inspectionDate;
-
-
-    
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vehicle_listing_id", nullable = false, unique = true)
-    private VehicleListing vehicleListing;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", nullable = false)

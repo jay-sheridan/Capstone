@@ -14,8 +14,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -25,6 +27,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "vehicle_listings")
+@Builder
 public class VehicleListing extends BaseEntity {
 
 	@Id
@@ -38,14 +41,14 @@ public class VehicleListing extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private Double listingPrice;
+    private Double listingPrice = 0.0;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
     private ListingStatus status = ListingStatus.DRAFT;
 
     @Column(nullable = false)
-    private Boolean visibleToBuyers = false;
+    private Boolean visibleToBuyers;
 
     private LocalDateTime publishedAt;
 
@@ -61,5 +64,12 @@ public class VehicleListing extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
     private Users seller;
+    
+    @PrePersist
+    public void prePersist() {
+    			if (publishedAt == null) {
+			publishedAt = LocalDateTime.now();
+		}
+    }
 
 }

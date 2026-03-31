@@ -46,6 +46,7 @@ public class VehiclePhoto extends BaseEntity {
     private Integer displayOrder;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean primaryPhoto = false;
 
     @ManyToOne(fetch = FetchType.LAZY)

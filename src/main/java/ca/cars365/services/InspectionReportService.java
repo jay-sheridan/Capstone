@@ -2,6 +2,7 @@ package ca.cars365.services;
 
 import org.springframework.stereotype.Service;
 
+import ca.cars365.entity.InspectionAppointment;
 import ca.cars365.entity.InspectionReport;
 
 @Service
@@ -18,4 +19,6 @@ public interface InspectionReportService {
     InspectionReport updateInspectionReport(Long id, InspectionReport updatedReport);
 
     void deleteInspectionReport(Long id);
+    
+    InspectionReport createInspectionReportForAppointment(InspectionAppointment appointment);
 }
