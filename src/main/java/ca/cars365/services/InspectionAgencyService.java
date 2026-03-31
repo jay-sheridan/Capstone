@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import ca.cars365.dto.response.InspectionAgencyResponse;
 import ca.cars365.entity.InspectionAgency;
 
 @Service
@@ -15,7 +16,7 @@ public interface InspectionAgencyService {
 
     InspectionAgency getAgencyByLicenseNumber(String licenseNumber);
 
-    List<InspectionAgency> getAllAgencies();
+    List<InspectionAgencyResponse> getAllAgencies();
 
     InspectionAgency updateAgency(Long id, InspectionAgency updatedAgency);
 

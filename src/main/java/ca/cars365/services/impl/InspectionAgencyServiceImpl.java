@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import ca.cars365.dto.response.InspectionAgencyResponse;
 import ca.cars365.entity.InspectionAgency;
 import ca.cars365.repositories.InspectionAgencyRepository;
 import ca.cars365.services.InspectionAgencyService;
@@ -33,9 +34,22 @@ public class InspectionAgencyServiceImpl implements InspectionAgencyService{
 	}
 
 	@Override
-	public List<InspectionAgency> getAllAgencies() {
+	public List<InspectionAgencyResponse> getAllAgencies() {
 		// TODO Auto-generated method stub
-		return null;
+		
+		List<InspectionAgency> agencies = inspectionAgencyRepository.findAll();
+		
+		return agencies.stream().map(agency -> InspectionAgencyResponse.builder()
+				.id(agency.getId())
+				.name(agency.getName())
+				.address(agency.getAddress())
+				.city(agency.getCity())
+				.provinceState(agency.getProvinceState())
+				.postalCode(agency.getPostalCode())
+				.country(agency.getCountry())
+				.phoneNumber(agency.getPhoneNumber())
+				.contactPersonName(agency.getContactPersonName())
+				.build()).toList();
 	}
 
 	@Override

@@ -17,8 +17,10 @@ import ca.cars365.repositories.VehicleRepository;
 import ca.cars365.repositories.VinDecodeRecordRepository;
 import ca.cars365.services.UserService;
 import ca.cars365.services.VehicleService;
+import jakarta.transaction.Transactional;
 
 @Service
+@Transactional
 public class VehicleServiceImpl implements VehicleService {
 
 	@Autowired

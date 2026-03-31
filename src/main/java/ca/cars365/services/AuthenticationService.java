@@ -75,6 +75,7 @@ public class AuthenticationService {
 				.passwordHash(passwordEncoder.encode(request.getPassword()))
 				.email(request.getEmail())
 				.phoneNumber(request.getPhoneNumber())
+				.contactPersonName(request.getContactPersonName())
 				.build();
 		
 		inspectionAgencyRepository.save(agency);
