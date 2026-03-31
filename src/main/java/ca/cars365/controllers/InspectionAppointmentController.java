@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ca.cars365.dto.request.InspectionAppointmentCreateRequest;
 import ca.cars365.dto.response.InspectionAppointmentResponse;
-import ca.cars365.entity.InspectionAppointment;
+import ca.cars365.entity.InspectionAgency;
+import ca.cars365.services.InspectionAgencyService;
 import ca.cars365.services.InspectionAppointmentService;
 import lombok.AllArgsConstructor;
 
@@ -18,12 +19,14 @@ import lombok.AllArgsConstructor;
 public class InspectionAppointmentController {
 	
 	private InspectionAppointmentService inspectionAppointmentService;
+	private InspectionAgencyService inspectionAgencyService;
 
 	@PostMapping
 	public ResponseEntity<InspectionAppointmentResponse> createInspectionAppointment(@RequestBody InspectionAppointmentCreateRequest appointment) {
-		
-		InspectionAppointmentResponse createdAppointment = inspectionAppointmentService.saveAppointment(appointment);
+		InspectionAgency agency = inspectionAgencyService.getAgencyById(appointment.getInspectionAgencyId());
+		InspectionAppointmentResponse createdAppointment = inspectionAppointmentService.saveAppointment(appointment, agency );
 		return ResponseEntity.ok(createdAppointment);
 			
 	}
+	
 }

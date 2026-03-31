@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import ca.cars365.dto.request.InspectionAppointmentCreateRequest;
 import ca.cars365.dto.response.InspectionAppointmentResponse;
+import ca.cars365.entity.InspectionAgency;
 import ca.cars365.entity.InspectionAppointment;
 import ca.cars365.enums.AppointmentStatus;
 import ca.cars365.repositories.InspectionAppointmentRepository;
@@ -23,16 +24,15 @@ public class InspectionAppointmentServiceImpl implements InspectionAppointmentSe
 
 	private InspectionAppointmentRepository inspectionAppointmentRepository;
 	private UserService userService;
-	private InspectionAgencyService inspectionAgencyService;
 	private VehicleService vehicleService;
 	private InspectionReportService inspectionReportService;
 	private VehicleListingService vehicleListingService;
 	
 	@Override
-	public InspectionAppointmentResponse saveAppointment(InspectionAppointmentCreateRequest appointment) {
+	public InspectionAppointmentResponse saveAppointment(InspectionAppointmentCreateRequest appointment, InspectionAgency agency) {
 
 		InspectionAppointment newAppointment  = InspectionAppointment.builder()
-				.inspectionAgency(inspectionAgencyService.getAgencyById(appointment.getInspectionAgencyId()))
+				.inspectionAgency(agency)
 				.seller(userService.getCurrentUserEntity())
 				.vehicle(vehicleService.getVehicleByVin(appointment.getVin()))
 				.appointmentDateTime(appointment.getAppointmentDateTime())
@@ -93,6 +93,12 @@ public class InspectionAppointmentServiceImpl implements InspectionAppointmentSe
 	public void deleteAppointment(Long id) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public List<InspectionAppointment> getAppointmentsByAgencyId(Long agencyId) {
+		
+		return inspectionAppointmentRepository.findByInspectionAgencyId(agencyId);
 	}
 
 }

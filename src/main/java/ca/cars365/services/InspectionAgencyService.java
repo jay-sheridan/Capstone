@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import ca.cars365.dto.response.AgencyInspectionAppointmentResponse;
 import ca.cars365.dto.response.InspectionAgencyResponse;
 import ca.cars365.entity.InspectionAgency;
 
@@ -21,5 +22,7 @@ public interface InspectionAgencyService {
     InspectionAgency updateAgency(Long id, InspectionAgency updatedAgency);
 
     void deleteAgency(Long id);
+
+	List<AgencyInspectionAppointmentResponse> getAllAppointmentsForAgency();
     
 }

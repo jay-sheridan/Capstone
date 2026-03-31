@@ -76,6 +76,7 @@ public class AuthenticationService {
 				.email(request.getEmail())
 				.phoneNumber(request.getPhoneNumber())
 				.contactPersonName(request.getContactPersonName())
+				.approved(true)
 				.build();
 		
 		inspectionAgencyRepository.save(agency);
