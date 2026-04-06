@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import ca.cars365.dto.response.VehicleListingResponse;
 import ca.cars365.entity.Vehicle;
 
 @Service
@@ -23,4 +24,6 @@ public interface VehicleListingService {
     void deleteVehicle(Long id);
 
 	void createVehicleListingForVehicle(Long id);
+
+	List<VehicleListingResponse> getVisibleListings();
 }

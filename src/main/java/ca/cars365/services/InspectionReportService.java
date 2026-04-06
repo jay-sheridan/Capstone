@@ -21,4 +21,6 @@ public interface InspectionReportService {
     void deleteInspectionReport(Long id);
     
     InspectionReport createInspectionReportForAppointment(InspectionAppointment appointment);
+    
+    Integer getInspectionScoreForVehicle(Long vehicleId);
 }

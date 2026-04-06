@@ -10,4 +10,6 @@ import ca.cars365.entity.VehiclePhoto;
 @Repository
 public interface VehiclePhotoRepository extends JpaRepository<VehiclePhoto, Long> {
 	List<VehiclePhoto> findByVehicleIdOrderByDisplayOrderAsc(Long vehicleId);
+	
+	VehiclePhoto findFirstByVehicleIdOrderByDisplayOrderAsc(Long vehicleId);
 }

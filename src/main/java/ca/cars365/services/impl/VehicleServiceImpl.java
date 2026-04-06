@@ -78,7 +78,7 @@ public class VehicleServiceImpl implements VehicleService {
 	@Override
 	public Vehicle createVehicleFromVin(String vin) {
 		VinDecodeRecord vinRecord = vinDecodeRecordRepository.findByVin(vin);
-		Vehicle vehicle = Vehicle.builder().vehicleName(vinRecord.getMake() + " " + vinRecord.getModel())
+		Vehicle vehicle = Vehicle.builder().vehicleName( vinRecord.getModelYear() + " " + vinRecord.getMake() + " " + vinRecord.getModel())
 				.vinDecodeRecord(vinRecord).vinDecoded(true).seller(userService.getCurrentUserEntity()).build();
 		
 		Vehicle savedVehicle = vehicleRepository.save(vehicle);

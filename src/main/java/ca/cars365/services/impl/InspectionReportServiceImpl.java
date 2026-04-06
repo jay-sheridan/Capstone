@@ -55,12 +55,19 @@ public class InspectionReportServiceImpl implements InspectionReportService {
 	public InspectionReport createInspectionReportForAppointment(InspectionAppointment appointment) {
 		
 		InspectionReport newReport = InspectionReport.builder()
+				
 				.vehicle(appointment.getVehicle())
 				.inspectionAgency(appointment.getInspectionAgency())
 				.inspectionAppointment(appointment)
 				.build();
-				
+		System.out.println("Creating at : " + newReport.getCreatedAt());
 		 return inspectionReportRepository.save(newReport);
+	}
+
+	@Override
+	public Integer getInspectionScoreForVehicle(Long vehicleId) {
+		InspectionReport report = inspectionReportRepository.findByVehicleId(vehicleId).getFirst();
+		return report.getScore();
 	}
 	
 	
