@@ -20,11 +20,6 @@ public class InspectionAgencyController {
 	
 	private InspectionAgencyService inspectionAgencyService;
 	
-	@GetMapping(value = {"/", "" })
-	public ResponseEntity<List<InspectionAgencyResponse>> getAllInspectionAgencies() {
-				List<InspectionAgencyResponse> agencies = inspectionAgencyService.getAllAgencies();
-		return ResponseEntity.ok(agencies);
-	}
 	
 	@GetMapping("/inspection/appointments")
 	public ResponseEntity<List<AgencyInspectionAppointmentResponse>> getInspectionsByAgency() {
@@ -32,7 +27,6 @@ public class InspectionAgencyController {
 		return ResponseEntity.ok(inspectionAgencyService.getAllAppointmentsForAgency());
 		
 	}
-	
 	
 
 }
