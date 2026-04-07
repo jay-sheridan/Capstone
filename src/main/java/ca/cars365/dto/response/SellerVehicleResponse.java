@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import ca.cars365.enums.InspectionStatus;
+import ca.cars365.enums.ListingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,12 +29,16 @@ public class SellerVehicleResponse {
     // Photos
     private List<VehiclePhotoResponse> photos;
     private String primaryPhotoUrl;
+    
+    // Listing Info
+    private ListingStatus listingStatus;
 
     // Inspection Info
     private InspectionStatus inspectionStatus;
     private Integer totalAppointments;
     private Integer totalReports;
     private Boolean hasReport;
+    private Integer inspectionScore;
 
     // Latest Appointment (optional summary)
     private AppointmentSummaryResponse latestAppointment;

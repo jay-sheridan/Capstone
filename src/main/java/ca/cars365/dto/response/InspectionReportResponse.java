@@ -1,5 +1,6 @@
 package ca.cars365.dto.response;
 
+import ca.cars365.enums.AppointmentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,12 +12,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class InspectionReportResponse {
 
-	private Long id;
-	private String reportNumber;
-	private Long inspectionAppointmentId;
-	private String inspectionAppointmentNumber;
-	private Long vehicleId;
+	
+	private AppointmentStatus appointmentStatus;
 	private String vehicleName;
-	private String inspectionAgencyName;
-	private String reportDetailsUrl;
+	private String sellerName;
+	private String reportNumber;
+	private Integer inspectionScore;
+	
+	
 }

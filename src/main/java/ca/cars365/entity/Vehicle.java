@@ -42,9 +42,6 @@ public class Vehicle extends BaseEntity {
 	@Column(nullable = false)
 	private String vehicleName;
 
-	@Builder.Default
-    private Double askingPrice = 0.0;
-
     @Column(nullable = false)
     @Builder.Default
     private Boolean vinDecoded = false;

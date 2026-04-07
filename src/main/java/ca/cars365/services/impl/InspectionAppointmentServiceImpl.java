@@ -24,8 +24,7 @@ public class InspectionAppointmentServiceImpl implements InspectionAppointmentSe
 
 	private InspectionAppointmentRepository inspectionAppointmentRepository;
 	private UserService userService;
-	private VehicleService vehicleService;
-	private InspectionReportService inspectionReportService;
+	private VehicleServiceImpl vehicleService;
 	private VehicleListingService vehicleListingService;
 	
 	@Override
@@ -38,13 +37,11 @@ public class InspectionAppointmentServiceImpl implements InspectionAppointmentSe
 				.appointmentDateTime(appointment.getAppointmentDateTime())
 				.appointmentStatus(AppointmentStatus.CONFIRMED)
 				.build();
-		System.out.println("Saving appointment: ");
+
 		InspectionAppointment createdAppointment =  inspectionAppointmentRepository.save(newAppointment);
 		
-		System.out.println("Created appointment: " );
-		inspectionReportService.createInspectionReportForAppointment(createdAppointment);
-		
-		vehicleListingService.createVehicleListingForVehicle(createdAppointment.getVehicle().getId());
+		vehicleListingService.createVehicleListingForVehicle(createdAppointment, createdAppointment.getVehicle().getId());
+		vehicleService.createInspectionReportForAppointment(createdAppointment);
 		
 		 InspectionAppointmentResponse response = InspectionAppointmentResponse.builder()
 				 .id(createdAppointment.getId())
@@ -92,13 +89,19 @@ public class InspectionAppointmentServiceImpl implements InspectionAppointmentSe
 	@Override
 	public void deleteAppointment(Long id) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public List<InspectionAppointment> getAppointmentsByAgencyId(Long agencyId) {
-		
+	public List<InspectionAppointment> getAppointmentsByAgencyId(Long agencyId) {	
 		return inspectionAppointmentRepository.findByInspectionAgencyId(agencyId);
+	}
+
+	@Override
+	public void markAppointmentAsCompleted(Long inspectionAppointmentId) {
+		InspectionAppointment appointment = getAppointmentById(inspectionAppointmentId);
+		appointment.setAppointmentStatus(AppointmentStatus.COMPLETED);
+		appointment.setUpdatedAt(java.time.LocalDateTime.now());
+		inspectionAppointmentRepository.save(appointment);		
 	}
 
 }

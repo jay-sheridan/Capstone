@@ -5,13 +5,17 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ca.cars365.dto.request.SellerVehicleUpdateRequest;
 import ca.cars365.dto.response.AppointmentSummaryResponse;
 import ca.cars365.dto.response.ReportSummaryResponse;
 import ca.cars365.dto.response.SellerVehicleResponse;
 import ca.cars365.dto.response.VehiclePhotoResponse;
+import ca.cars365.entity.InspectionAppointment;
 import ca.cars365.entity.Vehicle;
 import ca.cars365.entity.VehiclePhoto;
 import ca.cars365.entity.VinDecodeRecord;
+import ca.cars365.enums.ListingStatus;
+import ca.cars365.repositories.VehicleListingRepository;
 import ca.cars365.repositories.VehiclePhotoRepository;
 import ca.cars365.repositories.VehicleRepository;
 import ca.cars365.repositories.VinDecodeRecordRepository;
@@ -25,7 +29,7 @@ public class VehicleServiceImpl implements VehicleService {
 
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private VehicleRepository vehicleRepository;
 
@@ -34,6 +38,10 @@ public class VehicleServiceImpl implements VehicleService {
 
 	@Autowired
 	private VehiclePhotoRepository vehiclePhotoRepository;
+	
+	@Autowired
+	private InspectionReportServiceImpl inspectionReportService;
+	
 
 	@Override
 	public Vehicle saveVehicle(Vehicle vehicle) {
@@ -63,11 +71,6 @@ public class VehicleServiceImpl implements VehicleService {
 		return null;
 	}
 
-	@Override
-	public Vehicle updateVehicle(Long id, Vehicle updatedVehicle) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public void deleteVehicle(Long id) {
@@ -78,13 +81,12 @@ public class VehicleServiceImpl implements VehicleService {
 	@Override
 	public Vehicle createVehicleFromVin(String vin) {
 		VinDecodeRecord vinRecord = vinDecodeRecordRepository.findByVin(vin);
-		Vehicle vehicle = Vehicle.builder().vehicleName( vinRecord.getModelYear() + " " + vinRecord.getMake() + " " + vinRecord.getModel())
+		Vehicle vehicle = Vehicle.builder()
+				.vehicleName(vinRecord.getModelYear() + " " + vinRecord.getMake() + " " + vinRecord.getModel())
 				.vinDecodeRecord(vinRecord).vinDecoded(true).seller(userService.getCurrentUserEntity()).build();
-		
+
 		Vehicle savedVehicle = vehicleRepository.save(vehicle);
-		
-		
-		
+
 		return savedVehicle;
 	}
 
@@ -127,9 +129,21 @@ public class VehicleServiceImpl implements VehicleService {
 		return summary;
 	}
 
+	public Integer getInspectionScore(Long vehicleId) {
+		Vehicle vehicle = getVehicleById(vehicleId);
+		if (vehicle.getInspectionReports().isEmpty()) {
+			return null;
+		}
+		return vehicle.getInspectionReports().get(0).getScore();
+	}
+
+	public void createInspectionReportForAppointment(InspectionAppointment createdAppointment) {
+		inspectionReportService.createInspectionReportForAppointment(createdAppointment);
+	}
+
 	private SellerVehicleResponse mapToVehicleResponse(Vehicle vehicle) {
 		return SellerVehicleResponse.builder().id(vehicle.getId()).vehicleName(vehicle.getVehicleName())
-				.askingPrice(vehicle.getAskingPrice()).vin(vehicle.getVinDecodeRecord().getVin())
+				.vin(vehicle.getVinDecodeRecord().getVin())
 				.make(vehicle.getVinDecodeRecord().getMake()).model(vehicle.getVinDecodeRecord().getModel())
 				.modelYear(vehicle.getVinDecodeRecord().getModelYear()).photos(getVehiclePhotos(vehicle.getId()))
 				.primaryPhotoUrl(getPrimaryPhotoUrl(vehicle.getId())).inspectionStatus(vehicle.getInspectionStatus())
@@ -138,7 +152,11 @@ public class VehicleServiceImpl implements VehicleService {
 				.hasReport(!vehicle.getInspectionReports().isEmpty())
 				.latestAppointment(getLatestAppointmentSummary(vehicle.getId()))
 				.latestReport(getLatestReportSummary(vehicle.getId())).createdAt(vehicle.getCreatedAt())
-				.updatedAt(vehicle.getUpdatedAt()).build();
+				.updatedAt(vehicle.getUpdatedAt())
+				.inspectionScore(getInspectionScore(vehicle.getId()))
+				.listingStatus(vehicle.getListing().getStatus())
+				.askingPrice(vehicle.getListing().getListingPrice())
+				.build();
 	}
 
 	@Override
@@ -147,6 +165,33 @@ public class VehicleServiceImpl implements VehicleService {
 		List<Vehicle> vehicles = vehicleRepository.findBySellerId(userService.getCurrentUserEntity().getId());
 
 		return vehicles.stream().map(this::mapToVehicleResponse).toList();
+	}
+
+	@Override
+	public SellerVehicleResponse updateVehicle(Long vehicleId, SellerVehicleUpdateRequest updateRequest) {
+		 Vehicle existingVehicle = getVehicleById(vehicleId);
+		 
+		 if (existingVehicle == null) {
+			 throw new RuntimeException("Vehicle not found with id: " + vehicleId);
+		 }
+		 
+		 if (!existingVehicle.getSeller().getId().equals(userService.getCurrentUserEntity().getId())) {
+			 throw new RuntimeException("Unauthorized to update this vehicle");
+		 }
+		 
+		 existingVehicle.getListing().setStatus(updateRequest.getListingStatus());
+		 existingVehicle.getListing().setListingPrice(updateRequest.getAskingPrice());
+		 
+		 if (updateRequest.getListingStatus() == ListingStatus.PUBLISHED) {
+			 existingVehicle.getListing().setVisibleToBuyers(true);
+			 existingVehicle.getListing().setPublishedAt(java.time.LocalDateTime.now());
+		 } else if (updateRequest.getListingStatus() == ListingStatus.HIDDEN) {
+			 existingVehicle.getListing().setVisibleToBuyers(false);
+		 }
+		 
+		 Vehicle updatedVehicle = vehicleRepository.save(existingVehicle);
+		 
+		 return mapToVehicleResponse(updatedVehicle);
 	}
 
 }

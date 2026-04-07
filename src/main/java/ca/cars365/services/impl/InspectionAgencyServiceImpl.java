@@ -97,6 +97,7 @@ public class InspectionAgencyServiceImpl implements InspectionAgencyService {
 				 .toList();
 	}
 	
+	@Override
 	public InspectionAgency getCurrentLoggedInAgency() {
 		
 		String licenseNumber = SecurityUtils.getCurrentUserEmail(); // Assuming email is used as the unique identifier

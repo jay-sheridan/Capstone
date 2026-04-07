@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import ca.cars365.dto.request.SellerVehicleUpdateRequest;
 import ca.cars365.dto.response.SellerVehicleResponse;
 import ca.cars365.entity.Vehicle;
 import ca.cars365.entity.VinDecodeRecord;
@@ -22,7 +23,7 @@ public interface VehicleService {
 
     List<Vehicle> getAllVehicles();
 
-    Vehicle updateVehicle(Long id, Vehicle updatedVehicle);
+    SellerVehicleResponse updateVehicle(Long id, SellerVehicleUpdateRequest updateRequest);
 
     void deleteVehicle(Long id);
 	

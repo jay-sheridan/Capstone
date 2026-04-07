@@ -25,4 +25,6 @@ public interface InspectionAppointmentService {
     List<InspectionAppointment> getAppointmentsByAgencyId(Long agencyId);
     
     void deleteAppointment(Long id);
+
+	void markAppointmentAsCompleted(Long inspectionAppointmentId);
 }

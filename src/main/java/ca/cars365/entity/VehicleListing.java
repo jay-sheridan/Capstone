@@ -41,6 +41,7 @@ public class VehicleListing extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Builder.Default
     private Double listingPrice = 0.0;
 
     @Enumerated(EnumType.STRING)

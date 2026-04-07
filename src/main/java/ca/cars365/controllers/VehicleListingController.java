@@ -18,7 +18,7 @@ public class VehicleListingController {
 	
 	private VehicleListingService vehicleListingService;
 
-	@GetMapping
+	@GetMapping(value = {"/", "" })
     public ResponseEntity<List<VehicleListingResponse>> getVisibleListings() {
         return ResponseEntity.ok(vehicleListingService.getVisibleListings());
     }

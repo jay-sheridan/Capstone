@@ -24,5 +24,7 @@ public interface InspectionAgencyService {
     void deleteAgency(Long id);
 
 	List<AgencyInspectionAppointmentResponse> getAllAppointmentsForAgency();
+	
+	InspectionAgency getCurrentLoggedInAgency();
     
 }

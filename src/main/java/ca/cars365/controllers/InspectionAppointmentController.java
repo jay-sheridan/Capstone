@@ -21,7 +21,7 @@ public class InspectionAppointmentController {
 	private InspectionAppointmentService inspectionAppointmentService;
 	private InspectionAgencyService inspectionAgencyService;
 
-	@PostMapping
+	@PostMapping(value = {"/", "" })
 	public ResponseEntity<InspectionAppointmentResponse> createInspectionAppointment(@RequestBody InspectionAppointmentCreateRequest appointment) {
 		InspectionAgency agency = inspectionAgencyService.getAgencyById(appointment.getInspectionAgencyId());
 		InspectionAppointmentResponse createdAppointment = inspectionAppointmentService.saveAppointment(appointment, agency );

@@ -14,5 +14,5 @@ public interface InspectionReportRepository extends JpaRepository<InspectionRepo
 	List<InspectionReport> findByVehicleId(Long vehicleId);
 	
 	Optional<InspectionReport> findByReportNumber(String reportNumber);
-	
+		
 }

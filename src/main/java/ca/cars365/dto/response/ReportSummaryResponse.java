@@ -1,6 +1,6 @@
 package ca.cars365.dto.response;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import ca.cars365.enums.ReportResult;
 import lombok.AllArgsConstructor;
@@ -16,5 +16,5 @@ public class ReportSummaryResponse {
 
     private String reportNumber;
     private ReportResult overallResult;
-    private LocalDate inspectionDate;
+    private LocalDateTime inspectionDate;
 }
