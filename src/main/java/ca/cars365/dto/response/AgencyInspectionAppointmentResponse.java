@@ -31,6 +31,7 @@ public class AgencyInspectionAppointmentResponse {
     // Vehicle info (lightweight)
     private Long vehicleId;
     private String vehicleName;
+    private String vin;
 
     // Report info (optional)
     private Long inspectionReportId;

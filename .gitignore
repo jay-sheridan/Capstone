@@ -56,3 +56,5 @@ Thumbs.db
 *.swp
 
 # Maven wrapper artifacts should remain in the repo (mvnw, .mvn) - do not ignore them here
+# Local database and uploaded document contents
+/data/
