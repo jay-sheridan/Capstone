@@ -51,6 +51,9 @@ public class Users extends BaseEntity implements UserDetails {
     @Column(unique = true, length = 100)
     private String facebookId;
 
+    @Column(unique = true, length = 255)
+    private String googleId;
+
     @Column(name = "password_hash", nullable = false, columnDefinition = "TEXT")
     private String passwordHash;
 

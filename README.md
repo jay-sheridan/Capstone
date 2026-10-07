@@ -15,7 +15,17 @@ $env:JWT_SECRET_KEY = [Convert]::ToBase64String($keyBytes)
 
 The default H2 profile stores the local database in `data/`, which Git ignores. Uploaded documents and local database contents are not included in the repository.
 
-## Facebook Login
+## Google sign-in
+
+Create a Google OAuth client with application type **Web application** in Google Cloud. Add `https://localhost:5173` to its authorized JavaScript origins (and add your production frontend origin when deploying). Configure the consent screen and test users if the app is in testing.
+
+Set `$env:GOOGLE_CLIENT_ID = 'your-client-id.apps.googleusercontent.com'` in the backend terminal before running `.\mvnw.cmd spring-boot:run`. This flow does not require a client secret. `/api/v1/auth/google/config` exposes the public client ID; without configuration it returns HTTP 503.
+
+Login and signup use Google's official Identity Services button. The backend verifies Google's signed ID token, audience, issuer, and expiry, stores the Google subject in `users.google_id`, and issues a Cars365 JWT. Existing accounts with the same email must use their original sign-in method; accounts are not automatically linked. A real Google account login must be tested after configuring the client ID.
+
+See https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid and https://developers.google.com/identity/gsi/web/guides/verify-google-id-token.
+
+## Facebook setup
 
 The web login and signup buttons use the Facebook JavaScript SDK. The backend verifies the token with Meta before issuing a Cars365 JWT. Facebook identities are stored separately; existing email accounts are not automatically linked.
 

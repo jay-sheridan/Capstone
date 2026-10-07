@@ -9,6 +9,7 @@ import ca.cars365.entity.Users;
 
 @Repository
 public interface UserRepository extends JpaRepository<Users, Long> {
+	Optional<Users> findByGoogleId(String googleId);
 	Optional<Users> findByFacebookId(String facebookId);
 	Optional<Users> findByEmail(String email);
 
