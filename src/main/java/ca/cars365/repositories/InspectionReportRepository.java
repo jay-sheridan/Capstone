@@ -10,6 +10,8 @@ import ca.cars365.entity.InspectionReport;
 
 @Repository
 public interface InspectionReportRepository extends JpaRepository<InspectionReport, Long> {
+	Optional<InspectionReport> findByInspectionAppointmentId(Long appointmentId);
+	List<InspectionReport> findByInspectionAgencyId(Long agencyId);
 	
 	List<InspectionReport> findByVehicleId(Long vehicleId);
 	

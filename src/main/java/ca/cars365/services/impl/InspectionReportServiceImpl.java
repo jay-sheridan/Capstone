@@ -160,7 +160,7 @@ public class InspectionReportServiceImpl implements InspectionReportService {
 		
 		inspectionAppointmentRepository.save(appointment);
 		
-		 vehicleListingService.updateVehicleListingStatus(report.getVehicleId(), ListingStatus.INSPECTED);
+		 vehicleListingService.updateVehicleListingStatus(report.getVehicleId(), Boolean.TRUE.equals(report.getApprove()) ? ListingStatus.PUBLISHED : ListingStatus.INSPECTED);
 		 
 		 InspectionReportResponse response = InspectionReportResponse.builder()
 				 .appointmentStatus(savedReport.getInspectionAppointment().getAppointmentStatus())

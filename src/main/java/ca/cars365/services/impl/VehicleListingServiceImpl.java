@@ -82,7 +82,7 @@ public class VehicleListingServiceImpl implements VehicleListingService {
 		VehicleListing newListing = VehicleListing.builder().title(vehicle.getVehicleName())
 				.description("Listing for " + vehicle.getVehicleName()).status(ListingStatus.HIDDEN)
 				.visibleToBuyers(false).vehicle(vehicle)
-				.inspectionAgency(vehicle.getInspectionAppointment().get(0).getInspectionAgency())
+				.inspectionAgency(createdAppointment.getInspectionAgency())
 				.seller(vehicle.getSeller()).build();
 
 		vehicleListingRepository.save(newListing);
@@ -121,7 +121,7 @@ public class VehicleListingServiceImpl implements VehicleListingService {
 		if (vehicle == null) {
 			throw new RuntimeException("Vehicle not found with id: " + vehicleId);
 		}
-		vehicle.setInspectionStatus(InspectionStatus.APPROVED);
+		vehicle.setInspectionStatus(newStatus == ListingStatus.PUBLISHED ? InspectionStatus.APPROVED : InspectionStatus.COMPLETED);
 		vehicleRepository.save(vehicle);
 		VehicleListing listing = vehicleListingRepository.findByVehicleId(vehicleId).orElse(null);
 		

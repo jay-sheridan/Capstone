@@ -28,12 +28,22 @@ public class InspectionAppointmentServiceImpl implements InspectionAppointmentSe
 	private VehicleListingService vehicleListingService;
 	
 	@Override
+	@org.springframework.transaction.annotation.Transactional
 	public InspectionAppointmentResponse saveAppointment(InspectionAppointmentCreateRequest appointment, InspectionAgency agency) {
+		var seller = userService.getCurrentUserEntity();
+		var vehicle = vehicleService.getVehicleByVin(appointment.getVin());
+		if (vehicle == null) {
+			vehicle = vehicleService.createVehicleFromVin(appointment.getVin());
+		}
+		if (!vehicle.getSeller().getId().equals(seller.getId())) {
+			throw new org.springframework.web.server.ResponseStatusException(
+					org.springframework.http.HttpStatus.CONFLICT, "This vehicle belongs to another seller.");
+		}
 
 		InspectionAppointment newAppointment  = InspectionAppointment.builder()
 				.inspectionAgency(agency)
-				.seller(userService.getCurrentUserEntity())
-				.vehicle(vehicleService.getVehicleByVin(appointment.getVin()))
+				.seller(seller)
+				.vehicle(vehicle)
 				.appointmentDateTime(appointment.getAppointmentDateTime())
 				.appointmentStatus(AppointmentStatus.CONFIRMED)
 				.build();

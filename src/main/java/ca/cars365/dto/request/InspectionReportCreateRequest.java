@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class InspectionReportCreateRequest {
+    private Boolean approve;
 
     // =========================
     // Required relation IDs

@@ -81,6 +81,10 @@ public class VehicleServiceImpl implements VehicleService {
 	@Override
 	public Vehicle createVehicleFromVin(String vin) {
 		VinDecodeRecord vinRecord = vinDecodeRecordRepository.findByVin(vin);
+		if (vinRecord == null) {
+			throw new org.springframework.web.server.ResponseStatusException(
+					org.springframework.http.HttpStatus.BAD_REQUEST, "Look up the VIN before requesting an inspection.");
+		}
 		Vehicle vehicle = Vehicle.builder()
 				.vehicleName(vinRecord.getModelYear() + " " + vinRecord.getMake() + " " + vinRecord.getModel())
 				.vinDecodeRecord(vinRecord).vinDecoded(true).seller(userService.getCurrentUserEntity()).build();

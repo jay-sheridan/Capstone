@@ -66,6 +66,14 @@ public class VinDecodeRecordServiceImpl implements VinDecodeRecordService {
 	
 	@Override
 	public VehicleVinResponse decodeVin(String vin) {
+		VinDecodeRecord existing = vinDecodeRecordRepository.findByVin(vin);
+		if (existing != null) {
+			return VehicleVinResponse.builder().engineModel(existing.getEngineModel())
+					.make(existing.getMake()).model(existing.getModel())
+					.modelYear(String.valueOf(existing.getModelYear()))
+					.fuelTypePrimary(existing.getFuelTypePrimary()).vehicleType(existing.getVehicleType())
+					.plantCountry(existing.getPlantCountry()).transmissionStyle(existing.getTransmissionStyle()).build();
+		}
 
 		String url = baseUrl + "/" + vin + "?format=json";
 
