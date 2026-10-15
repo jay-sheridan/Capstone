@@ -47,6 +47,9 @@ Thumbs.db
 
 # Environment / Secrets
 /facebook-local.properties
+/neon-local.properties
+/gemini-local.properties
+/jwt-local.properties
 .env
 .env.*
 # Application properties often contain DB credentials - keep a template in the repo and keep real creds out

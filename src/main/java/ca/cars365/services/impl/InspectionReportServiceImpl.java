@@ -57,9 +57,9 @@ public class InspectionReportServiceImpl implements InspectionReportService {
 
 	@Override
 	public InspectionReport createInspectionReportForAppointment(InspectionAppointment appointment) {
-		
+
 		InspectionReport newReport = InspectionReport.builder()
-				
+
 				.vehicle(appointment.getVehicle())
 				.inspectionAgency(appointment.getInspectionAgency())
 				.inspectionAppointment(appointment)
@@ -70,110 +70,127 @@ public class InspectionReportServiceImpl implements InspectionReportService {
 
 	@Override
 	public Integer getInspectionScoreForVehicle(Long vehicleId) {
-		InspectionReport report = inspectionReportRepository.findByVehicleId(vehicleId).getFirst();
-		return report.getScore();
+		return inspectionReportRepository.findByVehicleId(vehicleId).stream().max(java.util.Comparator.comparing(InspectionReport::getId)).map(InspectionReport::getFinalizedScore).orElse(null);
 	}
-	
+
 	private InspectionReportResponse mapToInspectionReportResponse (InspectionReportCreateRequest report, InspectionReport existedEmptyReport) {
-		
-		
-		
+
+
+
+        if (Boolean.TRUE.equals(report.getApprove()) && (report.getOverallResult() != ca.cars365.enums.ReportResult.PASS
+            || !completeRequest(report))) {
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Approval requires PASS and all six component ratings (Good, Fair or Poor).");
+        }
+        existedEmptyReport.setApproved(Boolean.TRUE.equals(report.getApprove()));
+        existedEmptyReport.setScoreVersion(1);
+        existedEmptyReport.setEmissionsApplicable(!Boolean.FALSE.equals(report.getEmissionsApplicable()));
 		existedEmptyReport.setOverallResult(report.getOverallResult());
 		existedEmptyReport.setSummary(report.getSummary());
 		existedEmptyReport.setOdometerVerified(report.getOdometerVerified());
 		existedEmptyReport.setVinVerified(report.getVinVerified());
-		existedEmptyReport.setOdometerReading(report.getOdometerReading());
+		if (report.getOdometerReading() != null || Boolean.TRUE.equals(report.getOdometerReadingProvided())) existedEmptyReport.setOdometerReading(report.getOdometerReading());
 		existedEmptyReport.setEngineCondition(report.getEngineCondition());
-		existedEmptyReport.setEngineOilLeak(report.getEngineOilLeak());
-		existedEmptyReport.setCoolantLeak(report.getCoolantLeak());	
-		existedEmptyReport.setEngineMountConditionGood(report.getEngineMountConditionGood());
-		existedEmptyReport.setAbnormalEngineNoise(report.getAbnormalEngineNoise());
+		if (report.getEngineOilLeak() != null) existedEmptyReport.setEngineOilLeak(report.getEngineOilLeak());
+		if (report.getCoolantLeak() != null) existedEmptyReport.setCoolantLeak(report.getCoolantLeak());
+		if (report.getEngineMountConditionGood() != null) existedEmptyReport.setEngineMountConditionGood(report.getEngineMountConditionGood());
+		if (report.getAbnormalEngineNoise() != null) existedEmptyReport.setAbnormalEngineNoise(report.getAbnormalEngineNoise());
 		existedEmptyReport.setTransmissionCondition(report.getTransmissionCondition());
-		existedEmptyReport.setTransmissionLeak(report.getTransmissionLeak());
-		existedEmptyReport.setClutchConditionGood(report.getClutchConditionGood());
-		existedEmptyReport.setGearShiftSmooth(report.getGearShiftSmooth());
+		if (report.getTransmissionLeak() != null) existedEmptyReport.setTransmissionLeak(report.getTransmissionLeak());
+		if (report.getClutchConditionGood() != null) existedEmptyReport.setClutchConditionGood(report.getClutchConditionGood());
+		if (report.getGearShiftSmooth() != null) existedEmptyReport.setGearShiftSmooth(report.getGearShiftSmooth());
 		existedEmptyReport.setBrakeCondition(report.getBrakeCondition());
-		existedEmptyReport.setFrontBrakePadLifePercent(report.getFrontBrakePadLifePercent());
-		existedEmptyReport.setRearBrakePadLifePercent(report.getRearBrakePadLifePercent());
-		existedEmptyReport.setBrakeDiscConditionGood(report.getBrakeDiscConditionGood());
-		existedEmptyReport.setAbsWorking(report.getAbsWorking());
-		existedEmptyReport.setSuspensionCondition(report.getSuspensionCondition());
-		existedEmptyReport.setSteeringCondition(report.getSteeringCondition());
-		existedEmptyReport.setShockAbsorbersGood(report.getShockAbsorbersGood());
-		existedEmptyReport.setSteeringAlignmentGood(report.getSteeringAlignmentGood());
-		existedEmptyReport.setUnusualSuspensionNoise(report.getUnusualSuspensionNoise());
+		if (report.getFrontBrakePadLifePercent() != null) existedEmptyReport.setFrontBrakePadLifePercent(report.getFrontBrakePadLifePercent());
+		if (report.getRearBrakePadLifePercent() != null) existedEmptyReport.setRearBrakePadLifePercent(report.getRearBrakePadLifePercent());
+		if (report.getBrakeDiscConditionGood() != null) existedEmptyReport.setBrakeDiscConditionGood(report.getBrakeDiscConditionGood());
+		if (report.getAbsWorking() != null) existedEmptyReport.setAbsWorking(report.getAbsWorking());
+		if (report.getSuspensionCondition() != null) existedEmptyReport.setSuspensionCondition(report.getSuspensionCondition());
+		if (report.getSteeringCondition() != null) existedEmptyReport.setSteeringCondition(report.getSteeringCondition());
+		if (report.getShockAbsorbersGood() != null) existedEmptyReport.setShockAbsorbersGood(report.getShockAbsorbersGood());
+		if (report.getSteeringAlignmentGood() != null) existedEmptyReport.setSteeringAlignmentGood(report.getSteeringAlignmentGood());
+		if (report.getUnusualSuspensionNoise() != null) existedEmptyReport.setUnusualSuspensionNoise(report.getUnusualSuspensionNoise());
 		existedEmptyReport.setTireCondition(report.getTireCondition());
-		existedEmptyReport.setFrontLeftTreadDepth(report.getFrontLeftTreadDepth());
-		existedEmptyReport.setFrontRightTreadDepth(report.getFrontRightTreadDepth());
-		existedEmptyReport.setRearLeftTreadDepth(report.getRearLeftTreadDepth());
-		existedEmptyReport.setRearRightTreadDepth(report.getRearRightTreadDepth());
-		existedEmptyReport.setAllTiresMatchingBrand(report.getAllTiresMatchingBrand());
-		existedEmptyReport.setSpareTireAvailable(report.getSpareTireAvailable());
-		existedEmptyReport.setAlloyWheelDamage(report.getAlloyWheelDamage());
+		if (report.getFrontLeftTreadDepth() != null) existedEmptyReport.setFrontLeftTreadDepth(report.getFrontLeftTreadDepth());
+		if (report.getFrontRightTreadDepth() != null) existedEmptyReport.setFrontRightTreadDepth(report.getFrontRightTreadDepth());
+		if (report.getRearLeftTreadDepth() != null) existedEmptyReport.setRearLeftTreadDepth(report.getRearLeftTreadDepth());
+		if (report.getRearRightTreadDepth() != null) existedEmptyReport.setRearRightTreadDepth(report.getRearRightTreadDepth());
+		if (report.getAllTiresMatchingBrand() != null) existedEmptyReport.setAllTiresMatchingBrand(report.getAllTiresMatchingBrand());
+		if (report.getSpareTireAvailable() != null) existedEmptyReport.setSpareTireAvailable(report.getSpareTireAvailable());
+		if (report.getAlloyWheelDamage() != null) existedEmptyReport.setAlloyWheelDamage(report.getAlloyWheelDamage());
 		existedEmptyReport.setBodyCondition(report.getBodyCondition());
 		existedEmptyReport.setFrameCondition(report.getFrameCondition());
-		existedEmptyReport.setRepaintDetected(report.getRepaintDetected());
-		existedEmptyReport.setRustPresent(report.getRustPresent());
-		existedEmptyReport.setDentsPresent(report.getDentsPresent());
-		existedEmptyReport.setScratchesPresent(report.getScratchesPresent());
-		existedEmptyReport.setFloodDamageSigns(report.getFloodDamageSigns());
-		existedEmptyReport.setInteriorCondition(report.getInteriorCondition());
-		existedEmptyReport.setSeatConditionGood(report.getSeatConditionGood());
-		existedEmptyReport.setDashboardConditionGood(report.getDashboardConditionGood());
-		existedEmptyReport.setAirConditioningWorking(report.getAirConditioningWorking());
-		existedEmptyReport.setHeaterWorking(report.getHeaterWorking());
-		existedEmptyReport.setInfotainmentWorking(report.getInfotainmentWorking());
-		existedEmptyReport.setPowerWindowsWorking(report.getPowerWindowsWorking());
-		existedEmptyReport.setCentralLockWorking(report.getCentralLockWorking());
-		existedEmptyReport.setElectricalCondition(report.getElectricalCondition());
-		existedEmptyReport.setHeadlightsWorking(report.getHeadlightsWorking());
-		existedEmptyReport.setBrakeLightsWorking(report.getBrakeLightsWorking());
-		existedEmptyReport.setIndicatorsWorking(report.getIndicatorsWorking());
-		existedEmptyReport.setBatteryConditionGood(report.getBatteryConditionGood());
-		existedEmptyReport.setWarningLightsPresent(report.getWarningLightsPresent());
-		existedEmptyReport.setWarningLightDetails(report.getWarningLightDetails());
-		existedEmptyReport.setEngineOilLevelGood(report.getEngineOilLevelGood());
-		existedEmptyReport.setCoolantLevelGood(report.getCoolantLevelGood());
-		existedEmptyReport.setBrakeFluidLevelGood(report.getBrakeFluidLevelGood());
-		existedEmptyReport.setTransmissionFluidLevelGood(report.getTransmissionFluidLevelGood());
-		existedEmptyReport.setRoadTestPerformed(report.getRoadTestPerformed());
-		existedEmptyReport.setEngineStartsProperly(report.getEngineStartsProperly());
-		existedEmptyReport.setAccelerationGood(report.getAccelerationGood());
-		existedEmptyReport.setBrakingPerformanceGood(report.getBrakingPerformanceGood());
-		existedEmptyReport.setHighwayStable(report.getHighwayStable());
-		existedEmptyReport.setNoVibrationAtHighSpeed(report.getNoVibrationAtHighSpeed());
+		if (report.getRepaintDetected() != null) existedEmptyReport.setRepaintDetected(report.getRepaintDetected());
+		if (report.getRustPresent() != null) existedEmptyReport.setRustPresent(report.getRustPresent());
+		if (report.getDentsPresent() != null) existedEmptyReport.setDentsPresent(report.getDentsPresent());
+		if (report.getScratchesPresent() != null) existedEmptyReport.setScratchesPresent(report.getScratchesPresent());
+		if (report.getFloodDamageSigns() != null) existedEmptyReport.setFloodDamageSigns(report.getFloodDamageSigns());
+		if (report.getInteriorCondition() != null) existedEmptyReport.setInteriorCondition(report.getInteriorCondition());
+		if (report.getSeatConditionGood() != null) existedEmptyReport.setSeatConditionGood(report.getSeatConditionGood());
+		if (report.getDashboardConditionGood() != null) existedEmptyReport.setDashboardConditionGood(report.getDashboardConditionGood());
+		if (report.getAirConditioningWorking() != null) existedEmptyReport.setAirConditioningWorking(report.getAirConditioningWorking());
+		if (report.getHeaterWorking() != null) existedEmptyReport.setHeaterWorking(report.getHeaterWorking());
+		if (report.getInfotainmentWorking() != null) existedEmptyReport.setInfotainmentWorking(report.getInfotainmentWorking());
+		if (report.getPowerWindowsWorking() != null) existedEmptyReport.setPowerWindowsWorking(report.getPowerWindowsWorking());
+		if (report.getCentralLockWorking() != null) existedEmptyReport.setCentralLockWorking(report.getCentralLockWorking());
+		if (report.getElectricalCondition() != null) existedEmptyReport.setElectricalCondition(report.getElectricalCondition());
+		if (report.getHeadlightsWorking() != null) existedEmptyReport.setHeadlightsWorking(report.getHeadlightsWorking());
+		if (report.getBrakeLightsWorking() != null) existedEmptyReport.setBrakeLightsWorking(report.getBrakeLightsWorking());
+		if (report.getIndicatorsWorking() != null) existedEmptyReport.setIndicatorsWorking(report.getIndicatorsWorking());
+		if (report.getBatteryConditionGood() != null) existedEmptyReport.setBatteryConditionGood(report.getBatteryConditionGood());
+		if (report.getWarningLightsPresent() != null) existedEmptyReport.setWarningLightsPresent(report.getWarningLightsPresent());
+		if (report.getWarningLightDetails() != null) existedEmptyReport.setWarningLightDetails(report.getWarningLightDetails());
+		if (report.getEngineOilLevelGood() != null) existedEmptyReport.setEngineOilLevelGood(report.getEngineOilLevelGood());
+		if (report.getCoolantLevelGood() != null) existedEmptyReport.setCoolantLevelGood(report.getCoolantLevelGood());
+		if (report.getBrakeFluidLevelGood() != null) existedEmptyReport.setBrakeFluidLevelGood(report.getBrakeFluidLevelGood());
+		if (report.getTransmissionFluidLevelGood() != null) existedEmptyReport.setTransmissionFluidLevelGood(report.getTransmissionFluidLevelGood());
+		if (report.getRoadTestPerformed() != null) existedEmptyReport.setRoadTestPerformed(report.getRoadTestPerformed());
+		if (report.getEngineStartsProperly() != null) existedEmptyReport.setEngineStartsProperly(report.getEngineStartsProperly());
+		if (report.getAccelerationGood() != null) existedEmptyReport.setAccelerationGood(report.getAccelerationGood());
+		if (report.getBrakingPerformanceGood() != null) existedEmptyReport.setBrakingPerformanceGood(report.getBrakingPerformanceGood());
+		if (report.getHighwayStable() != null) existedEmptyReport.setHighwayStable(report.getHighwayStable());
+		if (report.getNoVibrationAtHighSpeed() != null) existedEmptyReport.setNoVibrationAtHighSpeed(report.getNoVibrationAtHighSpeed());
 		existedEmptyReport.setSafetyCheckPassed(report.getSafetyCheckPassed());
 		existedEmptyReport.setEmissionCheckPassed(report.getEmissionCheckPassed());
 		existedEmptyReport.setRecommendedRepairs(report.getRecommendedRepairs());
-		existedEmptyReport.setMajorIssues(report.getMajorIssues());
-		existedEmptyReport.setAgencyRecommendation(report.getAgencyRecommendation());
-		existedEmptyReport.setEstimatedRepairCost(report.getEstimatedRepairCost());
+		if (report.getMajorIssues() != null) existedEmptyReport.setMajorIssues(report.getMajorIssues());
+		if (report.getAgencyRecommendation() != null) existedEmptyReport.setAgencyRecommendation(report.getAgencyRecommendation());
+		if (report.getEstimatedRepairCost() != null) existedEmptyReport.setEstimatedRepairCost(report.getEstimatedRepairCost());
 		existedEmptyReport.calculateScoreInternal();
-		existedEmptyReport.setInspectionDate(LocalDateTime.now());
+		existedEmptyReport.setInspectionDate(report.getInspectionDate() == null ? LocalDateTime.now() : report.getInspectionDate().atStartOfDay());
 		existedEmptyReport.setUpdatedAt(LocalDateTime.now());
-		
+
 		InspectionReport savedReport =  inspectionReportRepository.save(existedEmptyReport);
-		
+
 		InspectionAppointment appointment = inspectionAppointmentRepository.findById(report.getInspectionAppointmentId()).orElseThrow(() -> new RuntimeException("Inspection Appointment not found with id: " + report.getInspectionAppointmentId()));
 
 		appointment.setAppointmentStatus(AppointmentStatus.COMPLETED);
-		
+
 		inspectionAppointmentRepository.save(appointment);
-		
-		 vehicleListingService.updateVehicleListingStatus(report.getVehicleId(), Boolean.TRUE.equals(report.getApprove()) ? ListingStatus.PUBLISHED : ListingStatus.INSPECTED);
-		 
+
+		 vehicleListingService.updateVehicleListingStatus(report.getVehicleId(), Boolean.TRUE.equals(report.getApprove()) && report.getOverallResult() == ca.cars365.enums.ReportResult.PASS ? ListingStatus.READY_TO_PUBLISH : ListingStatus.INSPECTED);
+
 		 InspectionReportResponse response = InspectionReportResponse.builder()
 				 .appointmentStatus(savedReport.getInspectionAppointment().getAppointmentStatus())
 				 .vehicleName(savedReport.getVehicle().getVehicleName())
 				 .sellerName(savedReport.getInspectionAppointment().getSeller().getFullName())
 				 .reportNumber(savedReport.getReportNumber())
-				 .inspectionScore(savedReport.getScore())
+				 .inspectionScore(savedReport.getFinalizedScore())
+                 .condition(savedReport.conditionSummary())
 				 .build();
 		return response;
 	}
 
+    private boolean completeRequest(InspectionReportCreateRequest r) {
+        return java.util.stream.Stream.of(r.getEngineCondition(), r.getTransmissionCondition(), r.getBrakeCondition(),
+            r.getTireCondition(), r.getBodyCondition(), r.getFrameCondition()).allMatch(v ->
+                v == ca.cars365.enums.ConditionStatus.GOOD || v == ca.cars365.enums.ConditionStatus.FAIR || v == ca.cars365.enums.ConditionStatus.POOR);
+    }
+
 	@Override
 	public InspectionReportResponse saveInspectionReport(InspectionReportCreateRequest report, InspectionReport existedEmptyReport) {
+        if (report.getOdometerReading() != null && report.getOdometerReading() < 0) {
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Mileage cannot be negative.");
+        }
 		return mapToInspectionReportResponse(report, existedEmptyReport);
 	}
 }

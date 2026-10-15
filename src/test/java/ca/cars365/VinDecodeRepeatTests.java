@@ -18,7 +18,7 @@ class VinDecodeRepeatTests {
         ReflectionTestUtils.setField(service, "vehicleService", vehicles);
         String vin = "2HGFB2F52FH001658";
         when(repository.findByVin(vin)).thenReturn(VinDecodeRecord.builder().vin(vin)
-                .make("HONDA").model("Civic").modelYear(2015).build());
+                .make("HONDA").model("Civic").modelYear(2015).bodyClass("Sedan/Saloon").build());
         for (int i = 0; i < 2; i++) {
             var result = service.decodeVin(vin);
             assertEquals("HONDA", result.getMake());

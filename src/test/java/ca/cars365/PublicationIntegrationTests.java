@@ -15,7 +15,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(properties = { "spring.datasource.url=jdbc:h2:mem:publication-tests;DB_CLOSE_DELAY=-1", "JWT_SECRET_KEY=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" })
+@org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable(named = "NEON_TEST_DATABASE_URL", matches = ".+")
+@SpringBootTest(properties = {
+    "spring.datasource.url=${NEON_TEST_DATABASE_URL}",
+    "spring.datasource.username=${NEON_TEST_DATABASE_USERNAME}",
+    "spring.datasource.password=${NEON_TEST_DATABASE_PASSWORD}",
+    "JWT_SECRET_KEY=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+})
 @Transactional
 class PublicationIntegrationTests {
     @Autowired EntityManager em;
@@ -45,11 +51,17 @@ class PublicationIntegrationTests {
         em.clear();
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(agency, null, agency.getAuthorities()));
         var request = InspectionReportCreateRequest.builder().inspectionAppointmentId(appointmentId)
-                .overallResult(ReportResult.PASS).approve(true).engineCondition(ConditionStatus.GOOD).build();
+                .overallResult(ReportResult.PASS).approve(true).engineCondition(ConditionStatus.GOOD).transmissionCondition(ConditionStatus.GOOD)
+                .brakeCondition(ConditionStatus.GOOD).tireCondition(ConditionStatus.GOOD).bodyCondition(ConditionStatus.GOOD).frameCondition(ConditionStatus.GOOD).build();
         reports.createInspectionReport(request);
         em.flush(); em.clear();
-        assertTrue(listings.getVisibleListings().stream().anyMatch(item -> item.getId().equals(listingId)));
+        assertFalse(listings.getVisibleListings().stream().anyMatch(item -> item.getId().equals(listingId)));
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(seller, null, seller.getAuthorities()));
+        assertEquals(false, sellers.status(appointmentId).get("live"));
+        assertEquals("READY_TO_PUBLISH", sellers.status(appointmentId).get("listingStatus"));
+        sellers.publish(listingId, new SellerController.PublishRequest(15000.0, true));
+        em.flush(); em.clear();
+        assertTrue(listings.getVisibleListings().stream().anyMatch(item -> item.getId().equals(listingId)));
         assertEquals(true, sellers.status(appointmentId).get("live"));
         assertEquals("PUBLISHED", sellers.status(appointmentId).get("listingStatus"));
     }

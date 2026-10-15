@@ -13,7 +13,21 @@ $env:JWT_SECRET_KEY = [Convert]::ToBase64String($keyBytes)
 .\mvnw.cmd spring-boot:run
 ```
 
-The default H2 profile stores the local database in `data/`, which Git ignores. Uploaded documents and local database contents are not included in the repository.
+The backend uses Neon PostgreSQL. Configure the connection below before starting it. Uploaded documents in `data/` are ignored by Git.
+
+## Neon PostgreSQL
+
+Create a project at https://console.neon.tech and open **Connect** to get its hostname, database, role, and password. Copy `neon-local.properties.example` to `neon-local.properties`, fill in the values, and keep `sslmode=require` in the JDBC URL. The local file is ignored by Git. Environment variables with the same names can also supply these values.
+
+Start with Java 21 and `JWT_SECRET_KEY` configured as above:
+
+```powershell
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=neon"
+```
+
+The default Neon profile creates/updates tables from the entities. Existing local database records are not transferred. Use `NEON_DDL_AUTO=validate` with managed schema migrations for a deployed database. The frontend continues to call the backend and needs no database credentials.
+
+Database integration tests require a separate Neon test branch configured through `NEON_TEST_DATABASE_URL`, `NEON_TEST_DATABASE_USERNAME`, and `NEON_TEST_DATABASE_PASSWORD`. They are skipped when the test URL is absent. Unit tests run without a database.
 
 ## Google sign-in
 

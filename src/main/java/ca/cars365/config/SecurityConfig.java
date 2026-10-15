@@ -42,7 +42,7 @@ public class SecurityConfig {
             .cors(cors -> {})
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/v1/auth/**", "/api/v1/home/test/", "/h2-console/**").permitAll()
+                .requestMatchers("/api/v1/auth/**", "/api/v1/home/test/").permitAll()
                 .requestMatchers("/api/v1/vin-decode/**").hasAuthority(UserRole.REGULAR_USER.name())
                 .requestMatchers("/api/v1/user/inspection/**").hasAuthority(UserRole.REGULAR_USER.name())
                 .requestMatchers("/api/v1/inspection/appointments/**").hasAuthority(UserRole.REGULAR_USER.name())

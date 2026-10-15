@@ -1,0 +1,7 @@
+# Copy to neon-local.properties and fill in your Neon connection details.
+# Select the neon profile when starting the backend.
+NEON_DATABASE_URL=jdbc:postgresql://YOUR_HOST:5432/neondb?sslmode=require
+NEON_DATABASE_USERNAME=YOUR_ROLE
+NEON_DATABASE_PASSWORD=YOUR_PASSWORD
+# update creates/updates tables for the capstone development database.
+NEON_DDL_AUTO=update

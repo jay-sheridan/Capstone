@@ -260,6 +260,12 @@ public class InspectionReport extends BaseEntity {
     private LocalDateTime inspectionDate;
     
     private Integer score;
+    private String rating;
+    // Nullable additions keep legacy rows readable without claiming their old score uses this formula.
+    private Integer scoreVersion;
+    private Boolean approved;
+    @Builder.Default
+    private Boolean emissionsApplicable = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", nullable = false)
@@ -294,188 +300,75 @@ public class InspectionReport extends BaseEntity {
     }
     
     public void calculateScoreInternal() {
-        int total = 100;
-
-        // =========================
-        // 1. Major system conditions
-        // =========================
-        total -= getConditionPenalty(engineCondition, 12);
-        total -= getConditionPenalty(transmissionCondition, 12);
-        total -= getConditionPenalty(brakeCondition, 10);
-        total -= getConditionPenalty(suspensionCondition, 8);
-        total -= getConditionPenalty(steeringCondition, 8);
-        total -= getConditionPenalty(tireCondition, 8);
-        total -= getConditionPenalty(bodyCondition, 6);
-        total -= getConditionPenalty(frameCondition, 12);
-        total -= getConditionPenalty(interiorCondition, 4);
-        total -= getConditionPenalty(electricalCondition, 8);
-
-        // =========================
-        // 2. Verification
-        // =========================
-        if (!Boolean.TRUE.equals(odometerVerified)) total -= 5;
-        if (!Boolean.TRUE.equals(vinVerified)) total -= 8;
-
-        // =========================
-        // 3. Engine
-        // =========================
-        if (Boolean.TRUE.equals(engineOilLeak)) total -= 8;
-        if (Boolean.TRUE.equals(coolantLeak)) total -= 6;
-        if (!Boolean.TRUE.equals(engineMountConditionGood)) total -= 3;
-        if (Boolean.TRUE.equals(abnormalEngineNoise)) total -= 8;
-
-        // =========================
-        // 4. Transmission
-        // =========================
-        if (Boolean.TRUE.equals(transmissionLeak)) total -= 8;
-        if (!Boolean.TRUE.equals(clutchConditionGood)) total -= 3;
-        if (!Boolean.TRUE.equals(gearShiftSmooth)) total -= 4;
-
-        // =========================
-        // 5. Brakes
-        // =========================
-        total -= getBrakePadPenalty(frontBrakePadLifePercent);
-        total -= getBrakePadPenalty(rearBrakePadLifePercent);
-
-        if (!Boolean.TRUE.equals(brakeDiscConditionGood)) total -= 5;
-        if (!Boolean.TRUE.equals(absWorking)) total -= 8;
-
-        // =========================
-        // 6. Suspension / Steering
-        // =========================
-        if (!Boolean.TRUE.equals(shockAbsorbersGood)) total -= 4;
-        if (!Boolean.TRUE.equals(steeringAlignmentGood)) total -= 4;
-        if (Boolean.TRUE.equals(unusualSuspensionNoise)) total -= 5;
-
-        // =========================
-        // 7. Tires / Wheels
-        // =========================
-        total -= getTreadPenalty(frontLeftTreadDepth);
-        total -= getTreadPenalty(frontRightTreadDepth);
-        total -= getTreadPenalty(rearLeftTreadDepth);
-        total -= getTreadPenalty(rearRightTreadDepth);
-
-        if (!Boolean.TRUE.equals(allTiresMatchingBrand)) total -= 2;
-        if (!Boolean.TRUE.equals(spareTireAvailable)) total -= 1;
-        if (Boolean.TRUE.equals(alloyWheelDamage)) total -= 2;
-
-        // =========================
-        // 8. Exterior / Body
-        // =========================
-        if (Boolean.TRUE.equals(repaintDetected)) total -= 2;
-        if (Boolean.TRUE.equals(rustPresent)) total -= 6;
-        if (Boolean.TRUE.equals(dentsPresent)) total -= 2;
-        if (Boolean.TRUE.equals(scratchesPresent)) total -= 1;
-        if (Boolean.TRUE.equals(floodDamageSigns)) total -= 15;
-
-        // =========================
-        // 9. Interior
-        // =========================
-        if (!Boolean.TRUE.equals(seatConditionGood)) total -= 2;
-        if (!Boolean.TRUE.equals(dashboardConditionGood)) total -= 2;
-        if (!Boolean.TRUE.equals(airConditioningWorking)) total -= 3;
-        if (!Boolean.TRUE.equals(heaterWorking)) total -= 2;
-        if (!Boolean.TRUE.equals(infotainmentWorking)) total -= 1;
-        if (!Boolean.TRUE.equals(powerWindowsWorking)) total -= 2;
-        if (!Boolean.TRUE.equals(centralLockWorking)) total -= 2;
-
-        // =========================
-        // 10. Electrical
-        // =========================
-        if (!Boolean.TRUE.equals(headlightsWorking)) total -= 3;
-        if (!Boolean.TRUE.equals(brakeLightsWorking)) total -= 4;
-        if (!Boolean.TRUE.equals(indicatorsWorking)) total -= 3;
-        if (!Boolean.TRUE.equals(batteryConditionGood)) total -= 4;
-        if (Boolean.TRUE.equals(warningLightsPresent)) total -= 10;
-
-        // =========================
-        // 11. Fluids
-        // =========================
-        if (!Boolean.TRUE.equals(engineOilLevelGood)) total -= 3;
-        if (!Boolean.TRUE.equals(coolantLevelGood)) total -= 3;
-        if (!Boolean.TRUE.equals(brakeFluidLevelGood)) total -= 4;
-        if (!Boolean.TRUE.equals(transmissionFluidLevelGood)) total -= 4;
-
-        // =========================
-        // 12. Road test
-        // =========================
-        if (!Boolean.TRUE.equals(roadTestPerformed)) {
-            total -= 10; // because full confidence is not possible
-        } else {
-            if (!Boolean.TRUE.equals(engineStartsProperly)) total -= 6;
-            if (!Boolean.TRUE.equals(accelerationGood)) total -= 4;
-            if (!Boolean.TRUE.equals(brakingPerformanceGood)) total -= 6;
-            if (!Boolean.TRUE.equals(highwayStable)) total -= 5;
-            if (!Boolean.TRUE.equals(noVibrationAtHighSpeed)) total -= 5;
-        }
-
-        // =========================
-        // 13. Compliance
-        // =========================
-        if (!Boolean.TRUE.equals(safetyCheckPassed)) total -= 15;
-        if (!Boolean.TRUE.equals(emissionCheckPassed)) total -= 8;
-
-        // =========================
-        // 14. Repair cost impact
-        // =========================
-        if (estimatedRepairCost != null) {
-            if (estimatedRepairCost > 5000) total -= 12;
-            else if (estimatedRepairCost > 3000) total -= 8;
-            else if (estimatedRepairCost > 1000) total -= 4;
-            else if (estimatedRepairCost > 500) total -= 2;
-        }
-
-        // =========================
-        // 15. Overall report result
-        // =========================
-        if (overallResult != null) {
-            switch (overallResult) {
-                case FAIL -> total -= 20;
-                case CONDITIONAL_PASS -> total -= 8;
-                case PASS -> total += 0;
-                case PENDING -> total -= 5;
-                default -> { }
-            }
-        }
-
-        // final safe range
-        if (total < 0) total = 0;
-        if (total > 100) total = 100;
-
-        this.score = total;
+        if (!hasCompleteComponents()) { score = null; rating = null; return; }
+        score = points(engineCondition, 20, 10) + points(transmissionCondition, 15, 8)
+            + points(brakeCondition, 20, 10) + points(tireCondition, 10, 5)
+            + points(bodyCondition, 10, 5) + points(frameCondition, 25, 12);
+        rating = ratingFor(score);
     }
 
-    private int getConditionPenalty(ConditionStatus status, int maxPenalty) {
-        if (status == null) return maxPenalty / 2;
-
-        String name = status.name().toUpperCase();
-
-        if (name.contains("EXCELLENT")) return 0;
-        if (name.contains("GOOD")) return maxPenalty / 4;
-        if (name.contains("FAIR")) return maxPenalty / 2;
-        if (name.contains("POOR")) return (maxPenalty * 3) / 4;
-        if (name.contains("BAD") || name.contains("FAILED") || name.contains("CRITICAL")) return maxPenalty;
-
-        return maxPenalty / 2;
+    public static String ratingFor(int score) {
+        if (score < 0 || score > 100) throw new IllegalArgumentException("Score must be between 0 and 100");
+        return score >= 90 ? "Excellent" : score >= 75 ? "Very Good" : score >= 60 ? "Good" : score >= 40 ? "Fair" : "Poor";
     }
 
-    private int getBrakePadPenalty(Integer percent) {
-        if (percent == null) return 2;
-        if (percent >= 70) return 0;
-        if (percent >= 50) return 2;
-        if (percent >= 30) return 4;
-        if (percent >= 15) return 6;
-        return 8;
+    private static boolean rated(ConditionStatus value) {
+        return value == ConditionStatus.GOOD || value == ConditionStatus.FAIR || value == ConditionStatus.POOR;
     }
 
-    private int getTreadPenalty(Integer depth) {
-        if (depth == null) return 2;
-        if (depth >= 7) return 0;
-        if (depth >= 5) return 1;
-        if (depth >= 3) return 3;
-        if (depth >= 2) return 6;
-        return 10;
+    private static int points(ConditionStatus value, int good, int fair) {
+        return value == ConditionStatus.GOOD ? good : value == ConditionStatus.FAIR ? fair : 0;
     }
-    
-    
+
+    public boolean hasCompleteComponents() {
+        return rated(engineCondition) && rated(transmissionCondition) && rated(brakeCondition)
+            && rated(tireCondition) && rated(bodyCondition) && rated(frameCondition);
+    }
+
+    public boolean isFinalized() {
+        return Integer.valueOf(1).equals(scoreVersion) && inspectionDate != null
+            && overallResult != null && overallResult != ReportResult.PENDING && hasCompleteComponents();
+    }
+
+    public Integer getFinalizedScore() {
+        return isFinalized() && Boolean.TRUE.equals(approved) ? score : null;
+    }
+
+    public boolean isCertified() {
+        return isFinalized() && Boolean.TRUE.equals(approved) && overallResult == ReportResult.PASS
+            && Boolean.TRUE.equals(vinVerified) && Boolean.TRUE.equals(odometerVerified)
+            && Boolean.TRUE.equals(safetyCheckPassed)
+            && (Boolean.FALSE.equals(emissionsApplicable) || Boolean.TRUE.equals(emissionCheckPassed))
+            && brakeCondition != ConditionStatus.POOR && frameCondition != ConditionStatus.POOR;
+    }
+
+    public String getVerificationStatus() {
+        if (overallResult == ReportResult.FAIL) return "Inspection Failed";
+        if (overallResult == ReportResult.CONDITIONAL_PASS || brakeCondition == ConditionStatus.POOR || frameCondition == ConditionStatus.POOR)
+            return "Repairs Required";
+        if (!isFinalized() || !Boolean.TRUE.equals(approved)) return "Inspection Pending";
+        return isCertified() ? "Car365 Certified" : "Verification Incomplete";
+    }
+
+    public java.util.Map<String, Object> conditionSummary() {
+        java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+        Integer visibleScore = getFinalizedScore();
+        result.put("score", visibleScore);
+        result.put("rating", visibleScore == null ? null : rating);
+        result.put("certified", isCertified());
+        result.put("status", getVerificationStatus());
+        result.put("overallResult", overallResult);
+        result.put("components", java.util.List.of(
+            component("Engine", engineCondition, 20, 10), component("Transmission", transmissionCondition, 15, 8),
+            component("Brakes", brakeCondition, 20, 10), component("Tires", tireCondition, 10, 5),
+            component("Body", bodyCondition, 10, 5), component("Frame", frameCondition, 25, 12)));
+        return result;
+    }
+
+    private java.util.Map<String, Object> component(String name, ConditionStatus value, int good, int fair) {
+        java.util.Map<String, Object> item = new java.util.LinkedHashMap<>();
+        item.put("name", name); item.put("condition", value); item.put("maximum", good);
+        item.put("points", getFinalizedScore() == null || !rated(value) ? null : points(value, good, fair));
+        return item;
+    }
 }

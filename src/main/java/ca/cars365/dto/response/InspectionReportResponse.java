@@ -18,6 +18,7 @@ public class InspectionReportResponse {
 	private String sellerName;
 	private String reportNumber;
 	private Integer inspectionScore;
+    private java.util.Map<String, Object> condition;
 	
 	
 }

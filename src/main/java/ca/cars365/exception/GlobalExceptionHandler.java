@@ -19,6 +19,10 @@ import ca.cars365.enums.ErrorType;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidJson(org.springframework.http.converter.HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest().body(Map.of("message", "Invalid report data. Check numeric values and required fields, then retry."));
+    }
 	@ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
 	public ResponseEntity<Map<String, String>> handleStatus(org.springframework.web.server.ResponseStatusException ex) {
 		return ResponseEntity.status(ex.getStatusCode()).body(Map.of("message", ex.getReason() == null ? "Request failed." : ex.getReason()));

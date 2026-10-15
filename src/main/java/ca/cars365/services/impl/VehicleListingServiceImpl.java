@@ -28,6 +28,8 @@ public class VehicleListingServiceImpl implements VehicleListingService {
 	private VehicleListingRepository vehicleListingRepository;
 	@Autowired
 	private VehiclePhotoService vehiclePhotoService;
+	@Autowired
+	private ca.cars365.repositories.AppointmentDocumentRepository documents;
 	
 	@Override
 	public Vehicle saveVehicle(Vehicle vehicle) {
@@ -90,17 +92,27 @@ public class VehicleListingServiceImpl implements VehicleListingService {
 	}
 	
 	public VehicleListingResponse mapToVehicleListingResponse(VehicleListing listing) {
+        var latestReport = listing.getVehicle().getInspectionReports().stream()
+            .max(java.util.Comparator.comparing(ca.cars365.entity.InspectionReport::getId)).orElse(null);
 		return VehicleListingResponse.builder()
 				.id(listing.getId())
+				.photoIds(documents.findByAppointmentVehicleIdAndKindOrderBySubmittedAtAsc(listing.getVehicle().getId(), "Vehicle photos").stream().filter(d -> java.util.Set.of("image/png", "image/jpeg").contains(d.getContentType())).map(ca.cars365.entity.AppointmentDocument::getId).toList())
 				.title(listing.getTitle())
 				.description(listing.getDescription())
 				.listingPrice(listing.getListingPrice())
+                .mileageKm(latestReport == null ? null : latestReport.getOdometerReading())
+                .modelYear(listing.getVehicle().getVinDecodeRecord() == null ? null : listing.getVehicle().getVinDecodeRecord().getModelYear())
+                .fuelType(listing.getVehicle().getVinDecodeRecord() == null ? null : listing.getVehicle().getVinDecodeRecord().getFuelTypePrimary())
+                .bodyType(listing.getVehicle().getVinDecodeRecord() == null ? null : listing.getVehicle().getVinDecodeRecord().getBodyClass())
+                .fuelTypeSecondary(listing.getVehicle().getVinDecodeRecord() == null ? null : listing.getVehicle().getVinDecodeRecord().getFuelTypeSecondary())
+                .electrificationLevel(listing.getVehicle().getVinDecodeRecord() == null ? null : listing.getVehicle().getVinDecodeRecord().getElectrificationLevel())
 				.status(listing.getStatus())
 				.inspectionAgencyName(listing.getInspectionAgency().getName())
 //				.imageUrl(vehiclePhotoService.getPrimaryPhotoUrl(listing.getVehicle().getId()))
 				.imageUrl(null) // Placeholder for image URL, implement as needed
 				.publishedAt(listing.getPublishedAt())
-				.inspectionScore(vehicleRepository.findById(listing.getVehicle().getId()).get().getInspectionReports().get(0).getScore())
+                .inspectionScore(latestReport == null ? null : latestReport.getFinalizedScore())
+                .condition(latestReport == null ? null : latestReport.conditionSummary())
 				.createdAt(listing.getCreatedAt())
 				.updatedAt(listing.getUpdatedAt())
 				.build();

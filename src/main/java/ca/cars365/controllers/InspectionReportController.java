@@ -39,6 +39,12 @@ public class InspectionReportController {
 		return ResponseEntity.ok(inspectionReportService.saveInspectionReport(report, existedEmptyReport));
 	}
 
+    @org.springframework.web.bind.annotation.GetMapping({"", "/"})
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public java.util.List<java.util.Map<String, Object>> getCurrentAgencyReports() {
+        return getReports(inspectionAgencyService.getCurrentLoggedInAgency().getId());
+    }
+
 	@org.springframework.web.bind.annotation.GetMapping("/agency/{agencyId}")
 	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public java.util.List<java.util.Map<String, Object>> getReports(@org.springframework.web.bind.annotation.PathVariable Long agencyId) {
@@ -48,7 +54,18 @@ public class InspectionReportController {
 			java.util.Map<String, Object> result = new java.util.HashMap<>();
 			result.put("id", report.getId()); result.put("reportNumber", report.getReportNumber());
 			result.put("vehicleId", report.getVehicle().getId()); result.put("overallResult", report.getOverallResult());
-			result.put("inspectionDate", report.getInspectionDate()); return result;
+			result.put("inspectionDate", report.getInspectionDate());
+            result.put("condition", report.conditionSummary());
+            result.put("inspectionAppointmentId", report.getInspectionAppointment().getId());
+            result.put("summary", report.getSummary()); result.put("recommendedRepairs", report.getRecommendedRepairs());
+            result.put("odometerVerified", report.getOdometerVerified()); result.put("vinVerified", report.getVinVerified());
+            result.put("odometerReading", report.getOdometerReading());
+            result.put("safetyCheckPassed", report.getSafetyCheckPassed()); result.put("emissionCheckPassed", report.getEmissionCheckPassed());
+            result.put("emissionsApplicable", !Boolean.FALSE.equals(report.getEmissionsApplicable()));
+            result.put("engineCondition", report.getEngineCondition()); result.put("transmissionCondition", report.getTransmissionCondition());
+            result.put("brakeCondition", report.getBrakeCondition()); result.put("tireCondition", report.getTireCondition());
+            result.put("bodyCondition", report.getBodyCondition()); result.put("frameCondition", report.getFrameCondition());
+            return result;
 		}).toList();
 	}
 }

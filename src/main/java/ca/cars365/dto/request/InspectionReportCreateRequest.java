@@ -13,11 +13,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
+@NoArgsConstructor(onConstructor_ = @com.fasterxml.jackson.annotation.JsonCreator)
 @AllArgsConstructor
 @Builder
 public class InspectionReportCreateRequest {
     private Boolean approve;
+    private Boolean emissionsApplicable;
+    private LocalDate inspectionDate;
 
     // =========================
     // Required relation IDs
@@ -46,6 +48,15 @@ public class InspectionReportCreateRequest {
 
     @Min(value = 0, message = "Odometer reading cannot be negative")
     private Integer odometerReading;
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @lombok.Setter(lombok.AccessLevel.NONE)
+    private Boolean odometerReadingProvided;
+
+    @com.fasterxml.jackson.annotation.JsonSetter("odometerReading")
+    public void setOdometerReading(Integer value) {
+        this.odometerReading = value;
+        this.odometerReadingProvided = true;
+    }
 
     // =========================
     // Engine

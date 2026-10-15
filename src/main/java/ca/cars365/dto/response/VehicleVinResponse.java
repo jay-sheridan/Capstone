@@ -15,6 +15,9 @@ public class VehicleVinResponse {
     private String model;
     private String modelYear;
     private String fuelTypePrimary;
+    private String fuelTypeSecondary;
+    private String electrificationLevel;
+    private String bodyClass;
     private String vehicleType;
     private String plantCountry;
     private String transmissionStyle;

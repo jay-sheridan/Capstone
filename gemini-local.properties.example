@@ -1,0 +1,3 @@
+# Copy to gemini-local.properties and enter your private key locally.
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.8-flash

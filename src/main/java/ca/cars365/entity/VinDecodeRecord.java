@@ -53,6 +53,9 @@ public class VinDecodeRecord extends BaseEntity {
 
     @Column(length = 100)
     private String fuelTypePrimary;
+    private String fuelTypeSecondary;
+    private String electrificationLevel;
+    private String bodyClass;
 
     @Column(length = 100)
     private String vehicleType;
